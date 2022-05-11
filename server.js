@@ -145,8 +145,7 @@ console.log('room', room)
     console.log('client', clientRooms[client.id])
   
     client.join(roomName);
-    
-  client.number = 2;
+
   client.emit('init', roomName);
   }
 
@@ -322,7 +321,7 @@ function FlagCardsHandle(data){
     console.log("flagStatepush",  flagState[0])
     codeStr = String(Object.values(code))
     console.log("codeStr", codeStr)
-    client.emit('subFlagData', {room:[{code:[{code},{cards},{user}, {socketId}]}]})
+     client.emit('subFlagData', {room:[{code:[{code},{cards},{user}, {socketId}]}]})
     client.broadcast.to(codeStr).emit('subFlagData', {room:[{code:[{code},{cards},{user},{socketId}]}]})
 }
 }
