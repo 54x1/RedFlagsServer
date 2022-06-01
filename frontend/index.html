@@ -6,6 +6,7 @@
   <title>Red Flags</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+  
     integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
@@ -32,12 +33,14 @@
 
     #sign .fa-plus-square {
       cursor: pointer;
-      font-size: 3em;
+      font-size: 8em;
     }
 
+    .red-flag-row{
+      display: flex;
+    }
     .vcenter,
     .game-section,
-    .red-flag-section,
     .card-section,
     .public-flags {
 
@@ -45,7 +48,7 @@
       min-height: fit-content;
       border: 3px solid #dae0e5;
       border-radius: 0.25rem;
-      margin: 15px 0 0 0;
+      margin: 12px 0 0 0;
       padding: 0px 6px;
     }
 
@@ -60,8 +63,7 @@
       flex: 1 1 100%;
     }
 
-    .game-section,
-    .red-flag-section {
+    .game-section {
       width: calc(50% - 0.75em);
       height: auto;
 
@@ -73,9 +75,20 @@
       min-height: 220px;
     }
 
+    .red-flag-msg{
+      padding: 6px;
+      margin-top: 12px;
+      height: fit-content;
+      width: 100%;
+      border: 3px solid #dae0e5;
+      border-radius: 0.25rem;
+      text-align: center;
+    }
+
     .red-flag-section {
       margin: 12px auto;
-      height: 130px;
+      height: fit-content;
+      padding: 0;
     }
 
     .red-flag-section .card-section {
@@ -92,7 +105,7 @@
       background-color: white;
       height: 150px;
       min-height: 150px;
-      border: 3px solid #c82333;
+      border: 6px solid #c82333;
       text-align: center;
       display: flex;
       align-items: center;
@@ -201,7 +214,8 @@ margin-left: 1em;
     }
 
     #new-red-flags-next-game{
-      margin-bottom: 1.75rem;
+      margin: 12px;
+      height: fit-content;
     }
 
     .leaderboard-section{
@@ -223,6 +237,13 @@ margin-left: 1em;
 
     .game-container .public-flags{
       display: none;
+    }
+
+    .modal-footer{
+      flex-wrap: nowrap;
+    }
+    .modal-footer .btn{
+      margin: 0 12px;
     }
   </style>
 </head>
@@ -295,20 +316,14 @@ margin-left: 1em;
           </div>
         </div>
         <div class="public-flags">
-          <p class="text-danger">
-            
-          </p>
         </div>
+        <div class="red-flag-row">
         <div class="red-flag-section text-danger text-center">
-          <p>
-            <p>SELECT</p> RED FLAG
-          </p>
-          <p id="sign">
+          <div id="sign">
             <i class="text-danger far fa-plus-square"></i>
-
-
-
+          </div>
         </div>
+      </div>
       </div>
     </div>
 
@@ -339,25 +354,25 @@ margin-left: 1em;
 
 
       <div class="flags">
-        <div class="card-section text-center">
+        <div class="card-section text-center" data-toggle="modal" data-target="#exampleModal">
           <p>
 
           </p>
 
         </div>
-        <div class="card-section text-center">
+        <div class="card-section text-center" data-toggle="modal" data-target="#exampleModal">
           <p>
 
           </p>
 
         </div>
-        <div class="card-section text-center">
+        <div class="card-section text-center" data-toggle="modal" data-target="#exampleModal">
           <p>
 
           </p>
 
         </div>
-        <div class="card-section text-center">
+        <div class="card-section text-center" data-toggle="modal" data-target="#exampleModal">
           <p>
 
           </p>
@@ -366,19 +381,35 @@ margin-left: 1em;
     </div>
   </section>
   <section class="leaderboard-section container">
-    <i class="fa fa-times exit-right text-danger" aria-hidden="true"></i>
+    <i class="fa fa-times exit-right text-danger"></i>
 
     <ol>
     </ol>
   </section>
-
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="justify-content-center modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Selecting</h5>
+      </div>
+      <div class="modal-body">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn cancel btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn confirm btn-danger" data-dismiss="modal">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
   <script src="https://cdn.socket.io/socket.io-2.3.1.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <!-- <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
-
   <script src="index.js"></script>
+  
 </body>
 
 </html>
