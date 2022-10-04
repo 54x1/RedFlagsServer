@@ -10,7 +10,7 @@ let d = [];
 let da = [];
 let pubFlags = [];
 let thisFlag;
-let voting = false;
+let voting;
 let selected = false;
 const gameScreen = document.getElementById("gameScreen");
 const initialScreen = document.getElementById("initialScreen");
@@ -90,6 +90,7 @@ function chooseWinnerDisplay(data) {
 function isVotingData(data) {
   voting = data;
   console.log("isVotingData", voting);
+  socket.emit("voting", voting);
 }
 /*
 function subFlagDataRandom(data) {
@@ -164,6 +165,7 @@ function subFlagDataRandom(data) {
 
 // }
 function userJoinedDisplay(data) {
+  $(".alert>*").remove()
   $(".alert").fadeIn();
 
   $(".alert").append(
@@ -188,6 +190,8 @@ function userJoinedDisplay(data) {
       $(".alert-success").slideUp(300);
       $(".alert").hide(200);
     });
+    
+
 }
 
 function userJoinedData(data) {
@@ -255,14 +259,34 @@ console.log("dadada", a );
 
 }
 
-function playerdc(data) {
+function playerdc(displayUser) {
+  console.log("here", displayUser);
+
+  socket.emit('playerDis', displayUser)
+  $(".alert").fadeIn();
+
+  $(".alert").append(
+    "<div class='alert-secondary' role='alert'>" +
+      displayUser +
+      " has left</div>"
+  );
+  $(".alert-secondary")
+    .fadeTo(1300, 300)
+    .slideUp(300, function () {
+      $(".alert-secondary").slideUp(300);
+      $(".alert").hide(200);
+    })
+    $(".alert-secondary").fadeOut(1000)
+  console.log("playerdc", displayUser);
+  socket.emit("player", displayUser, gameCodeDisplay.innerText);
   console.log("pfunc", $(".leaderboard-section mark").text());
 
   $(".leaderboard-section mark").each(function () {
-    if ($(this).text() === data) {
+    if ($(this).text() === displayUser) {
       $(this).parent().remove();
     }
   });
+  displayUser = ""
 }
 
 function removeCard(data, text) {
@@ -327,7 +351,7 @@ function newFlagCard() {
 }
 
 $(document).on("click", "#new-red-flags-next-game", function () {
-   voting == false
+   voting = false
   let code = gameCodeDisplay.innerText;
   console.log("fd", d)
   socket.emit("newRound", code, d);
@@ -342,6 +366,7 @@ $(document).on("click", "#new-red-flags-next-game", function () {
 });
 
 function startVoteData() {
+  voting = true;
   console.log("voting time");
   socket.emit("chooseWinner", [
     $(".user span").html(),
@@ -373,7 +398,7 @@ function startVoteData() {
       );
     }
   });
-  voting = true;
+
   socket.emit("isVoting", voting, gameCodeDisplay.innerText);
 }
 
@@ -533,24 +558,24 @@ $("#genNewUser").click(function () {
   usernameGen();
 });
 socket.on("disconnect", () => {
+
   console.log("here", displayUser);
 
   // socket.emit('playerDis', displayUser)
   $(".alert").fadeIn();
 
   $(".alert").append(
-    "<div class='alert-secondary' role='alert'>" +
-      displayUser +
-      " has left</div>"
+    "<div class='alert-secondary' role='alert'>YOU have left the game!</div>"
   );
-  $(".alert-secondary")
-    .fadeTo(1300, 300)
-    .slideUp(300, function () {
-      $(".alert-secondary").slideUp(300);
-      $(".alert").hide(200);
-    });
-  console.log("playerdc", displayUser);
+  // $(".alert-secondary")
+  //   .fadeTo(1300, 300)
+  //   .slideUp(300, function () {
+  //     $(".alert-secondary").slideUp(300);
+  //     $(".alert").hide(200);
+  //   });
+  //   $(".alert-secondary").fadeOut(1000)
   socket.emit("player", displayUser, gameCodeDisplay.innerText);
+  // window.location = '/'
 });
 
 // function newUserData(data, c){
@@ -560,8 +585,8 @@ socket.on("disconnect", () => {
 // socket.emit('player', displayUser, gameCodeDisplay.innerText)
 // }
 
-function newFlagData(data) {
-  if (voting) {
+function newFlagData(data, voting) {
+  if (voting === true) {
     console.log("votin", voting);
     $("#sign").bind("click", function () {
       return false;
@@ -572,12 +597,12 @@ function newFlagData(data) {
     $("#sign").unbind("click");
     $("#sign").css({ cursor: "pointer" });
   }
-  console.log("vvote", voting);
+  console.log("vvote", voting, data);
   
   let us =  $(".user span").html()
 	console.log("called1",  us)
   
-	console.log('newFlagData', data.filter(e => e[0].code === gameCodeDisplay.innerText))
+	console.log('newFlagData', voting, data.filter(e => e[0].code === gameCodeDisplay.innerText))
 	d.push(data.filter(e => e[0].code === gameCodeDisplay.innerText))
 
 	

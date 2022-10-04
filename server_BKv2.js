@@ -26,7 +26,6 @@ let flagStateRand = []
 let pperkss;
 let gameData = []
 let game = []
-let voting
 
 const clientRooms = {};
 app.use(express.static(publicPath));
@@ -74,8 +73,6 @@ function newTimerData(data){
 rArr.filter(d => d)
 }
 function isVotingData(data, code){
-  voting = data
-  console.log("voting", voting)
   client.emit('isVotingData', data)
   client.broadcast.to(code).emit('isVotingData', data)
 }
@@ -153,8 +150,10 @@ function newRoundClear(code){
 
 function votingHandle(data){
   console.log("vvvdata", data)
-
-  voting = data
+  client.emit('votingSettings')
+  if (data){
+return true;
+  } 
 }
 function handleJoinGame(roomName) {
   // votingHandle()
@@ -342,12 +341,12 @@ function newJoinFlagDataHandle(cards){
 }
 
 function newJoinFlagHandle(code){
-  console.log("newJoinFlagHandle", voting, flagState.filter(f=>f[0].code === code))
+  console.log("newJoinFlagHandle", flagState.filter(f=>f[0].code === code))
 
     //if(flagState[0] != null){
 //if (flagState){
   client.emit("testff", flagState.filter(f=>f[0].code === code) )
-      client.emit('newFlagData', flagState.filter(f=>f[0].code === code), voting)
+      client.emit('newFlagData', flagState.filter(f=>f[0].code === code))
 //}
 //else{
 //  client.emit('newFlagData', flagStateRand)
@@ -449,7 +448,8 @@ client.emit('ppperks', pp)
  }
 let playerdc;
 let displayCode
- function playerData(displayUser, code){
+ function 
+ (displayUser, code){
    
    playerdc = displayUser
    displayCode = code
@@ -468,14 +468,11 @@ client.on('disconnect', ()=>{
 
   console.log('disconnect', String(Object.keys(users)))   
 let name = Object.values(users)
-
+console.log("nameeee", playerdc, displayCode)
 flagState = flagState.filter(e => e[0].code !== displayCode)
 // playerData()
-console.log("playerdccc", playerdc, displayCode, flagState)
 client.broadcast.to(displayCode).emit('playerdc', playerdc)
 delete users[client.id]
-// console.log('nameee', name)
-
 console.log("be4flagState", flagState)
 let d = []
 d.push(flagState)
@@ -487,6 +484,7 @@ d.push(flagState)
 // f[0].room[3].
 client.emit('removeFlag', displayCode)
 // console.log("res", res)
+
 })
 })
 
