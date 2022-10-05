@@ -7,6 +7,7 @@ const socketIO = require('socket.io');
 const { flags } = require('socket.io/lib/namespace');
 const cli = require('nodemon/lib/cli');
 const { count } = require('console');
+const { clearLine } = require('readline');
 
 const publicPath = path.join(__dirname, '/frontend/');
 
@@ -80,7 +81,7 @@ function isVotingData(data, code){
   client.broadcast.to(code).emit('isVotingData', data)
 }
 function chooseWinnerData(data){
-  console.log(data)
+  console.log("chooseWinnerDataa", data)
   client.broadcast.to(data[1]).emit('chooseWinnerDisplay', data[0])
 }
 
@@ -155,6 +156,7 @@ function votingHandle(data){
   console.log("vvvdata", data)
 
   voting = data
+
 }
 function handleJoinGame(roomName) {
   // votingHandle()
@@ -363,9 +365,10 @@ function newJoinFlagHandle(code){
 
 
 
-function FlagCardsHandle(data){
+function FlagCardsHandle(data, voting){
   console.log("subFlagDataHDCH", data)
-  client.emit('testff', data)
+  console.log('FlagCardsHandle', voting)
+  client.emit('testff', voting)
   if (data.room[1].cards !== "" ){
       let code = data.room[0].code
       let cards = data.room[1].cards
@@ -461,8 +464,8 @@ let displayCode
 function playerDis(code, disname){
   console.log('hhhere', code, disname)
 // client.emit("playerdc", data)
-client.broadcast.to(code).emit('playerdc', disname)
-return code, disname;
+// client.broadcast.to(code).emit('playerdc', disname)
+return playerdc, disname;
 } 
 client.on('disconnect', ()=>{
 
@@ -470,11 +473,12 @@ client.on('disconnect', ()=>{
 let name = Object.values(users)
 
 flagState = flagState.filter(e => e[0].code !== displayCode)
-// playerData()
-console.log("playerdccc", playerdc, displayCode, flagState)
-client.broadcast.to(displayCode).emit('playerdc', playerdc)
+
+// console.log('nameee1', users[client.id])
+console.log("playerdccc", users[client.id].code, users[client.id].username.name)
+client.broadcast.to(users[client.id].code).emit('playerdc', users[client.id].username.name)
 delete users[client.id]
-// console.log('nameee', name)
+console.log('nameee2', name)
 
 console.log("be4flagState", flagState)
 let d = []

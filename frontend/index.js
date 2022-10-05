@@ -47,8 +47,8 @@ socket.on("perks", handlePerks);
 socket.on("ppperks", handlePPerks);
 //socket.on('newPerks', handleNewPerks)
 
-// socket.on('unknownCode', handleUnknownCode);
-// socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('unknownCode', handleUnknownCode);
+socket.on('tooManyPlayers', handleTooManyPlayers);
 // socket.on('flagData', flagData);
 socket.on("subFlagData", subFlagDataSelf);
 socket.on("subFlagDataSelf", subFlagDataSelf);
@@ -260,9 +260,9 @@ console.log("dadada", a );
 }
 
 function playerdc(displayUser) {
-  console.log("here", displayUser);
+  console.log("playerdc_here", displayUser);
 
-  socket.emit('playerDis', displayUser)
+  // socket.emit('playerDis', displayUser)
   $(".alert").fadeIn();
 
   $(".alert").append(
@@ -278,7 +278,7 @@ function playerdc(displayUser) {
     })
     $(".alert-secondary").fadeOut(1000)
   console.log("playerdc", displayUser);
-  socket.emit("player", displayUser, gameCodeDisplay.innerText);
+  // socket.emit("player", displayUser, gameCodeDisplay.innerText);
   console.log("pfunc", $(".leaderboard-section mark").text());
 
   $(".leaderboard-section mark").each(function () {
@@ -347,11 +347,15 @@ function newFlagCard() {
     '<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>'
   );
   socket.emit("newRoundClear", code);
-  voting == false
+  voting = false
+  console.log("isVotingData", voting);
+  socket.emit("isVoting", voting);
 }
 
 $(document).on("click", "#new-red-flags-next-game", function () {
    voting = false
+   console.log("isVotingData", voting);
+   socket.emit("isVoting", voting);
   let code = gameCodeDisplay.innerText;
   console.log("fd", d)
   socket.emit("newRound", code, d);
@@ -365,7 +369,7 @@ $(document).on("click", "#new-red-flags-next-game", function () {
   $("#new-red-flags-next-game, .red-flag-msg").remove();
 });
 
-function startVoteData() {
+function startVoteData(voting) {
   voting = true;
   console.log("voting time");
   socket.emit("chooseWinner", [
@@ -573,9 +577,9 @@ socket.on("disconnect", () => {
   //     $(".alert-secondary").slideUp(300);
   //     $(".alert").hide(200);
   //   });
-  //   $(".alert-secondary").fadeOut(1000)
+    // $(".alert-secondary").fadeOut(1000)  
   socket.emit("player", displayUser, gameCodeDisplay.innerText);
-  // window.location = '/'
+  window.location = '/'
 });
 
 // function newUserData(data, c){
@@ -617,7 +621,7 @@ function newFlagData(data, voting) {
 		$('.public-flags').css({"display":"flex"})
       }
    $('.public-flags').append("<div class='card-section text-center'>"+
-[$(this)].filter(cc => cc[0].code === gameCodeDisplay.innerText).map(m=> m[1].cards)+"</div>")
+[$(this)].filter(cc => cc[0].code === gameCodeDisplay.innerText).map(m=> m[1].cards)+"yyy</div>")
   })
 // }
 //   let us = $(".user span").html();
@@ -649,7 +653,8 @@ function newFlagData(data, voting) {
 }
 
 
-function subFlagDataSelf(data) {
+function subFlagDataSelf(data, voting) {
+  console.log("votingxxx", voting)
   console.log("ddzz", data)
   console.log("called3", $(".user span").html());
 
@@ -667,11 +672,31 @@ pubFlags.push($(this).text())
 console.log("newda", newDa.filter(bb=>bb[0].room[0].code[0].code === gameCodeDisplay.innerText))
 let newFlagArr = newDa.filter(bb=>bb[0].room[0].code[0].code === gameCodeDisplay.innerText).filter(bb=> !b.includes(bb[0].room[0].code[1].cards))
 let newFlagArrSet = [...(newFlagArr)]
-   $('.public-flags').append("<div class='card-section text-center'>"+
-   newFlagArr.map(m=>m[0].room[0].code[1].cards)+"</div>")
+if (newFlagArr.map(m=>m[0].room[0].code[1].cards).length > 0){
+$('.public-flags').css({'display':'flex'})
+}
+
+   if (voting === true){
+       $('.public-flags>*').remove()
+    $('.public-flags').append("<div class='card-section text-center'>"+
+    newFlagArr.map(m=>m[0].room[0].code[1].cards)+"</div>")
+   }else{
+   $('.public-flags>*').remove()
+    if (newFlagArr.filter(f=>f[0].room[0].code[2].user === $('.user span').html()).map(m=>m[0].room[0].code[1].cards).length > 0){
+      $('.public-flags').append("<div class='card-section text-center'>"+
+      newFlagArr.filter(f=>f[0].room[0].code[2].user === $('.user span').html()).map(m=>m[0].room[0].code[1].cards)+"xxx</div>")  
+    }
+  if (newFlagArr.filter(f=>f[0].room[0].code[2].user !== $('.user span').html()).map(m=>m[0].room[0].code[2].user).length > 0){
+    newFlagArr.filter(f=>f[0].room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m[0].room[0].code[2].user +"'s FLAG</div>")+"")
+    }
+
+  }
+
+
       console.log('subFlagDatazself', da)
       console.log('subFlagDatazselfd',  newDa)
-	  console.log('zz', newFlagArrSet 
+      console.log('yy',)
+	  console.log('zz', newFlagArr, newFlagArrSet
     )
 }
 
@@ -895,7 +920,7 @@ $(document).on("click", ".game-place .flags .card-section ", function () {
     console.log("herere")
   });
 
-$(document).on("click", ".confirm", function () {
+$(document).on("click", ".confirm", function (voting) {
   socket.emit('timer', gameCodeDisplay.innerText)
   if (thisFlag !== ""){
   console.log("timer", timerRand)
@@ -934,7 +959,8 @@ console.log("difference", difference)
 
       let code = gameCodeDisplay.innerText;
       let user = $(".user span").html();
-socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]})
+      console.log('vvvv', voting)
+socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]}, voting)
 
       data = { room: [{ code }, { cards }, { user }, { socketId }] };
       console.log("dataz", data);
@@ -1170,12 +1196,12 @@ function handleUnknownCode() {
   reset();
 
   socket.emit("unknown");
-  alert("Unknown Game Code");
+  alert("Unknown Room Code");
 }
 
 function handleTooManyPlayers() {
+  alert("This room is full!\nCreate new game!");
   reset();
-  alert("This game has max players");
 }
 
 function reset() {
