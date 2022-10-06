@@ -64,6 +64,12 @@ client.on('isVoting', isVotingData)
 client.on('timer', timerData)
 client.on('newTimer', newTimerData)
 client.on('newRoundClean', newRoundClean)
+client.on('showFlag', showFlagHandle)
+
+function showFlagHandle(newFlagArr, code){
+  // client.emit('showFlag', newFlagArr)
+  client.broadcast.to(code).emit('showFlag', newFlagArr)
+}
 
 function newRoundClean(code){
   flagState.filter(x=> x[0].code)
@@ -74,11 +80,10 @@ function newTimerData(data){
   client.emit("testffz", rArr, data[0], data[1])
 rArr.filter(d => d)
 }
-function isVotingData(data, code){
-  voting = data
+function isVotingData(voting, code, flags){
   console.log("voting", voting)
-  client.emit('isVotingData', data)
-  client.broadcast.to(code).emit('isVotingData', data)
+  client.emit('isVotingData', voting, flags)
+  client.broadcast.to(code).emit('isVotingData', voting, flags)
 }
 function chooseWinnerData(data){
   console.log("chooseWinnerDataa", data)
@@ -148,14 +153,17 @@ function leaderboardData(data){
 function newRoundClear(code){
  
   flagState = flagState.filter(e => e[0].code !== code)
- console.log("theAAA", flagState, code)
+ console.log("newRoundClear", flagState, code)
 
 }
 
-function votingHandle(data){
-  console.log("vvvdata", data)
+function votingHandle(voting, code){
+  console.log("vvvdata", voting, code)
 
-  voting = data
+  voting = voting
+
+  client.emit('vote', voting)
+  client.broadcast.to(code).emit('vote', voting )
 
 }
 function handleJoinGame(roomName) {
@@ -248,12 +256,12 @@ function handleNewGame() {
 
 }
 
-function removeCardHandle(data, text){
+function removeCardHandle(remCard, text, data){
   console.log("removeFlag", data)
   client.emit('removeFlag', data[1])
     client.broadcast.to(data[1]).emit('removeFlag', data[1])
-  client.emit('removeCardSelf', data, text)
-  client.broadcast.to(data[1]).emit('removeCard', data, text)
+  client.emit('removeCardSelf', remCard, text, data)
+  client.broadcast.to(data[1]).emit('removeCard', remCard, data)
 }
 
 let prev = null
@@ -315,8 +323,8 @@ if (s == null){
 
 startv--
     console.log("astartv", startv)
-    console.log("gameuser", gameuser[startv].socketId, gameuser[startv] )
-    io.to(gameuser[startv].socketId).emit('startVote', user);
+    console.log("gameuser", gameuser[startv].socketId, gameuser[startv], flagState )
+    io.to(gameuser[startv].socketId).emit('startVote', flagState, gameuser[startv]);
 // userCount = 0
 gameuser = ""
 }else{
@@ -472,11 +480,13 @@ client.on('disconnect', ()=>{
   console.log('disconnect', String(Object.keys(users)))   
 let name = Object.values(users)
 
-flagState = flagState.filter(e => e[0].code !== displayCode)
 
 // console.log('nameee1', users[client.id])
-console.log("playerdccc", users[client.id].code, users[client.id].username.name)
+console.log("playerdccc", users[client.id])
+if (users[client.id]){
+  flagState = flagState.filter(e => e[0].code !== users[client.id].code)
 client.broadcast.to(users[client.id].code).emit('playerdc', users[client.id].username.name)
+}
 delete users[client.id]
 console.log('nameee2', name)
 
@@ -484,7 +494,7 @@ console.log("be4flagState", flagState)
 let d = []
 d.push(flagState)
     console.log("flagStateforeach",  d)
-
+    client.emit('testff', d )
 // flagState = ff
 // }
 
