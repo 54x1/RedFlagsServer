@@ -125,13 +125,7 @@ function isVotingData(voting, data) {
    
    }
 
-   if(socketIdData === socketId){
-    console.log('matching hereee')
-    $(".public-flags .card-section").css({
-      "background-color": "#c82333",
-      color: "white",
-    });
-   }
+
   // socket.emit("voting", voting, gameCodeDisplay.innerText);
 }
 /*
@@ -251,7 +245,7 @@ $(document).on("click", ".fa-trophy", function () {
 });
 
 function removeFlagData(data) {
-console.log('z', data)
+console.log('removeFlagDataz', data)
 console.log("dadada", da );
  
 a = da.filter(e => e[0].room[0].code[0].code === data);
@@ -333,37 +327,61 @@ function playerdc(displayUser) {
 
 function removeCard(remCard, data) {
 
-  console.log("remdaat", remCard, data, winUser);
-  console.log("bb", String(data[0]));
-  console.log("winUser", winUser)
+  console.log("remdaat", String(remCard[0]), String(remCard[1]), remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
+  console.log("bb[0]", String(remCard[0]));
+  console.log("dd[1]", String(remCard[1]));
+  console.log("cc[2]", String(remCard[2]));
   console.log("aa", $(".public-flags .card-section").text());
   $("#gameScreen .red-flag-row .red-flag-msg").html(
     "<b>Waiting on next round</b>"
   );
+  if (String(remCard[2]).length >0){
   $("#gameScreen .public-flags").before(
-    '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].card === remName).map(m=>m[2].user)+'Has the winner FLAG</b></p>'
-  );
-  $(".public-flags .card-section").each(function () {
-    let remName = $(this).html();
+    '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
+  }else{
+    $("#gameScreen .public-flags").before(
+      '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+    );
+  }
+
+
+    $('.public-flags>*').remove()
+    $(".public-flags").append(
+      '<div class="card-section text-center">' +
+      String(remCard[0]) +
+        "</div>"
+    )
+    // $(".public-flags .card-section").each(function () {
+    // let remName = $(this).html();
    
-    if (remName !== String(data[0])) {
-      console.log("this", $(this).html());
-      $(this).remove();
-    }
-  });
+    // if (remName !== String(remCard[0])) {
+    //   console.log("card", $(this).html());
+    //   $(this).remove();
+    // }
+  // });
 }
 
-function removeCardSelf(remCard, text, data) {
+function removeCardSelf(remCard, data) {
   // $('.red-flag-row').html('<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>')
-  console.log("remdaat", remCard, data, text);
-  console.log("winUserSelf", winUser)
-  console.log("bb", String(data[0]));
-  console.log("aa", $(".public-flags .card-section").text());
+  console.log("remdaat", remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
+  console.log("bb[0]_self", String(remCard[0]));
+  console.log("dd[1]_self", String(remCard[1]));
+  console.log("cc[2]_self", String(remCard[2]));
+  console.log("aa_self", $(".public-flags .card-section").text());
   // $('#gameScreen .red-flag-row .red-flag-msg').html("<b>Waiting on next round</b>")
-  // $('#gameScreen .public-flags').before('<p class="red-flag-msg"><b>Winner FLAG</b></p>')
+  // $('#gameScreen .public-flags').before('<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winner FLAG</b></p>')
+  
+  if (String(remCard[2]).length >0){
+    $("#gameScreen .public-flags").before(
+      '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
+    }else{
+      $("#gameScreen .public-flags").before(
+        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+      );
+    }
   $(".public-flags .card-section").each(function () {
     let remName = $(this).html();
-    if (remName !== String(data[0])) {
+    if (remName !== String(remCard[0])) {
       console.log("this", $(this).html());
       $(this).remove();
     }
@@ -418,6 +436,23 @@ function startVoteData(data, gameuser) {
   voting = true;
   console.log("voting time", data, gameuser );
 socketIdData = gameuser.socketId
+if (voting === true){
+  $('.public-flags>*').remove()
+  data.filter(f=>f[2].user !== $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+ m +"</div>"))
+ data.filter(f=>f[2].user === $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+ m +"</div>"))
+ $(".public-flags .card-section").css({
+  "background-color": "#c82333",
+  color: "white",
+});
+ }else{
+   console.log("elsedata", data)
+ 
+ }
+  console.log('matching hereee')
+
+
   socket.emit("chooseWinner", [
     $(".user span").html(),
     gameCodeDisplay.innerText,
@@ -425,22 +460,27 @@ socketIdData = gameuser.socketId
   ]);
 
   $(".red-flag-row").html(
-    '<p class="red-flag-msg"><b>Choose the winner FLAG</b></p>'
+    '<p class="red-flag-msg"><b>Choose the winning FLAG</b></p>'
   );
 
   $(document).on("click", ".public-flags .card-section", function () {
     if ($(this).css("background-color") == "rgb(200, 35, 51)") {
-      remCard = [$(this).html(), gameCodeDisplay.innerText];
-      text = "Winner FLAG";
-      console.log("this", $(this).html())
-      socket.emit("removeCard", remCard, text, data);
+      let cardz = $(this).html()
+     
+      console.log("aahhh", da)
+      console.log("dataa_click", typeof cardz,  cardz,
+      data.filter(f=>
+        console.log("fff", f[0].code === gameCodeDisplay.innerText &&  [f[1].cards].filter(f=>
+          console.log("f",typeof f, f)))), 
+          data)
+
+      let remCard = [cardz, gameCodeDisplay.innerText, data.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].cards === String(cardz)).map(m=>m[2].user)];
+      console.log("remCard", remCard)
+      socket.emit("removeCard", remCard, data);
       $(".public-flags .card-section").css({
         "background-color": "white",
         color: "black",
       });
-      $("#gameScreen .public-flags").before(
-        '<p class="red-flag-msg"><b>Winner FLAG</b></p>'
-      );
       $("#gameScreen .red-flag-row .red-flag-msg").remove();
       $("#gameScreen .red-flag-row").append(
         '<div id="new-red-flags-next-game" class="btn btn-danger"><span class="title">Next Round</span><i class="bottom-right fas fa-arrow-right"></i></div>'

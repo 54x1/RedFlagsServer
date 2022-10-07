@@ -82,7 +82,7 @@ rArr.filter(d => d)
 }
 function isVotingData(voting, code, flags){
   console.log("voting", voting)
-  client.emit('isVotingData', voting, flags)
+  // client.emit('isVotingData', voting, flags)
   client.broadcast.to(code).emit('isVotingData', voting, flags)
 }
 function chooseWinnerData(data){
@@ -256,12 +256,12 @@ function handleNewGame() {
 
 }
 
-function removeCardHandle(remCard, text, data){
-  console.log("removeFlag", data)
-  client.emit('removeFlag', data[1])
-    client.broadcast.to(data[1]).emit('removeFlag', data[1])
-  client.emit('removeCardSelf', remCard, text, data)
-  client.broadcast.to(data[1]).emit('removeCard', remCard, data)
+function removeCardHandle(remCard, data){
+  console.log("removeFlag", data, remCard)
+  client.emit('removeFlag', remCard[1])
+    client.broadcast.to(remCard[1]).emit('removeFlag', remCard[1])
+  client.emit('removeCardSelf', remCard, data)
+  client.broadcast.to(remCard[1]).emit('removeCard', remCard, data)
 }
 
 let prev = null
