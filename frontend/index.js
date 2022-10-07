@@ -64,7 +64,7 @@ socket.on("removeCard", removeCard);
 socket.on("removeCardSelf", removeCardSelf);
 socket.on("newFlagCard", newFlagCard);
 socket.on("playerdc", playerdc);
-socket.on("removeFlag", removeFlagData);
+// socket.on("removeFlag", removeFlagData);
 socket.on("userJoined", userJoinedData);
 socket.on("userJoinedDisplay", userJoinedDisplay);
 // socket.on('leaderboardDisplayData', leaderboardDisplayData)
@@ -245,13 +245,13 @@ $(document).on("click", ".fa-trophy", function () {
 });
 
 function removeFlagData(data) {
-console.log('removeFlagDataz', data)
-console.log("dadada", da );
+// console.log('removeFlagDataz', data)
+// console.log("dadada", da );
  
-a = da.filter(e => e[0].room[0].code[0].code === data);
-a.forEach(f => da.splice(da.findIndex(e => e[0].room[0].code[0].code  === f[0].room[0].code[0].code  ),1));
+// a = da.filter(e => e[0].room[0].code[0].code === data);
+// a.forEach(f => da.splice(da.findIndex(e => e[0].room[0].code[0].code  === f[0].room[0].code[0].code  ),1));
 
-console.log("removeFlagData", a );
+// console.log("removeFlagData", a );
  
 // function removeItemAll(arr, value) {
 //   var i = 0;
@@ -361,7 +361,7 @@ function removeCard(remCard, data) {
   // });
 }
 
-function removeCardSelf(remCard, data) {
+function removeCardSelf(remCard, data, winUser) {
   // $('.red-flag-row').html('<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>')
   console.log("remdaat", remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
   console.log("bb[0]_self", String(remCard[0]));
@@ -376,7 +376,7 @@ function removeCardSelf(remCard, data) {
       '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
     }else{
       $("#gameScreen .public-flags").before(
-        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+        '<p class="red-flag-msg"><b>'+winUser+' has the winning FLAG</b></p>'
       );
     }
   $(".public-flags .card-section").each(function () {
