@@ -340,7 +340,7 @@ function removeCard(remCard, data) {
     '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
   }else{
     $("#gameScreen .public-flags").before(
-      '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+      '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
     );
   }
 
@@ -376,7 +376,7 @@ function removeCardSelf(remCard, data) {
       '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
     }else{
       $("#gameScreen .public-flags").before(
-        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
       );
     }
   $(".public-flags .card-section").each(function () {
