@@ -322,8 +322,8 @@ if (s == null){
 }
 
 startv--
-    console.log("astartv", startv)
-    console.log("gameuser", gameuser[startv].socketId, gameuser[startv], flagState )
+    console.log("astartv", startv, gameuser[startv].socketId, gameuser[startv],)
+    console.log("gameuser", flagState )
     io.to(gameuser[startv].socketId).emit('startVote', flagState, gameuser[startv]);
 // userCount = 0
 gameuser = ""
