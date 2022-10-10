@@ -257,11 +257,11 @@ function handleNewGame() {
 }
 
 function removeCardHandle(remCard, data){
-  console.log("removeFlag", remCard, data)
-  client.emit('removeFlag', data, remCard)
-    client.broadcast.to(remCard[1]).emit('removeFlag',data, remCard)
-  client.emit('removeCardSelf', remCard, data, remCard[2])
-  client.broadcast.to(remCard[1]).emit('removeCard', remCard, data,  remCard[2])
+  console.log("removeFlag", data, remCard)
+  client.emit('removeFlag', remCard[1])
+    client.broadcast.to(remCard[1]).emit('removeFlag', remCard[1])
+  client.emit('removeCardSelf', remCard, data)
+  client.broadcast.to(remCard[1]).emit('removeCard', remCard, data)
 }
 
 let prev = null
