@@ -63,7 +63,7 @@ client.on('chooseWinner', chooseWinnerData )
 client.on('isVoting', isVotingData)
 client.on('timer', timerData)
 client.on('newTimer', newTimerData)
-// client.on('newRoundClean', newRoundClean)
+client.on('newRoundClean', newRoundClean)
 client.on('showFlag', showFlagHandle)
 
 function showFlagHandle(newFlagArr, code){
@@ -71,10 +71,10 @@ function showFlagHandle(newFlagArr, code){
   client.broadcast.to(code).emit('showFlag', newFlagArr)
 }
 
-// function newRoundClean(code){
-//   flagState.filter(x=> x[0].code)
-//   client.emit('removeFlag')
-// }
+function newRoundClean(code){
+  flagState.filter(x=> x[0].code)
+  client.emit('removeFlag')
+}
 function newTimerData(data){
   console.log("console", rArr, data[0], data[1])
   client.emit("testffz", rArr, data[0], data[1])
@@ -257,9 +257,9 @@ function handleNewGame() {
 }
 
 function removeCardHandle(remCard, data){
-  console.log("removeFlag", remCard, data)
+  console.log("removeFlag", data, remCard)
   client.emit('removeFlag', remCard[1])
-    client.broadcast.to(remCard[1]).emit('removeFlag', remCard)
+    client.broadcast.to(remCard[1]).emit('removeFlag', remCard[1])
   client.emit('removeCardSelf', remCard, data)
   client.broadcast.to(remCard[1]).emit('removeCard', remCard, data)
 }
@@ -322,8 +322,8 @@ if (s == null){
 }
 
 startv--
-    console.log("astartv", startv, gameuser[startv].socketId, gameuser[startv],)
-    console.log("flagState_gameuser", flagState )
+    console.log("astartv", startv)
+    console.log("gameuser", gameuser[startv].socketId, gameuser[startv], flagState )
     io.to(gameuser[startv].socketId).emit('startVote', flagState, gameuser[startv]);
 // userCount = 0
 gameuser = ""

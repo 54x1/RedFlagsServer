@@ -14,8 +14,6 @@ let thisFlag;
 let voting;
 let selected = false;
 let showFlagData = [];
-let userCardData
-let votingUser
 const gameScreen = document.getElementById("gameScreen");
 const initialScreen = document.getElementById("initialScreen");
 const loginSection = document.getElementById("login-section");
@@ -108,8 +106,7 @@ function randTimeData(data){
 timerRand = data
 }
 function chooseWinnerDisplay(data) {
-  votingUser = data
-  console.log("voting_user", data);
+  console.log("datazzz", data);
   $(".red-flag-row").html(
     "<p class='red-flag-msg'><b>'" + data + "'" + " is choosing</b></p>"
   );
@@ -343,7 +340,7 @@ function removeCard(remCard, data) {
     '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
   }else{
     $("#gameScreen .public-flags").before(
-      '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+      '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
     );
   }
 
@@ -379,7 +376,7 @@ function removeCardSelf(remCard, data) {
       '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
     }else{
       $("#gameScreen .public-flags").before(
-        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
+        '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
       );
     }
   $(".public-flags .card-section").each(function () {
@@ -435,8 +432,7 @@ $(document).on("click", "#new-red-flags-next-game", function () {
   $("#new-red-flags-next-game, .red-flag-msg").remove();
 });
 
-function startVoteData(data, gameuser, userCardData, votingUser) {
-  userCardData = data
+function startVoteData(data, gameuser) {
   voting = true;
   console.log("voting time", data, gameuser );
 socketIdData = gameuser.socketId
@@ -467,16 +463,20 @@ if (voting === true){
     '<p class="red-flag-msg"><b>Choose the winning FLAG</b></p>'
   );
 
-  $(document).on("click", ".public-flags .card-section", function ({userCardData, votingUser}) {
-    console.log("data=", userCardData, votingUser)
-    if ($('.user span').html() === votingUser) {
+  $(document).on("click", ".public-flags .card-section", function () {
+    if ($(this).css("background-color") == "rgb(200, 35, 51)") {
       let cardz = $(this).html()
+     
+      console.log("aahhh", da)
+      console.log("dataa_click", typeof cardz,  cardz,
+      data.filter(f=>
+        console.log("fff", f[0].code === gameCodeDisplay.innerText &&  [f[1].cards].filter(f=>
+          console.log("f",typeof f, f)))), 
+          data)
 
-      console.log("dataa_click", userCardData, cardz)
-
-      let remCard = [cardz, gameCodeDisplay.innerText, userCardData.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].cards === String(cardz)).map(m=>m[2].user)];
+      let remCard = [cardz, gameCodeDisplay.innerText, data.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].cards === String(cardz)).map(m=>m[2].user)];
       console.log("remCard", remCard)
-      socket.emit("removeCard", remCard, userCardData);
+      socket.emit("removeCard", remCard, data);
       $(".public-flags .card-section").css({
         "background-color": "white",
         color: "black",
@@ -489,7 +489,7 @@ if (voting === true){
   });
 
   socket.emit("isVoting", voting, gameCodeDisplay.innerText, data);
-userCardData = ""
+
 }
 
 usernameGen();
@@ -976,7 +976,7 @@ function startTimer(duration) {
           room: [{ code }, { cards }, { user }, { socketId }],
         });
 
-        let data = { room: [{ code }, { cards }, { user }, { socketId }] };
+        data = { room: [{ code }, { cards }, { user }, { socketId }] };
         console.log("dataRandz", data);
       }, 3000);
     }
@@ -1051,7 +1051,7 @@ console.log("difference", difference)
         console.log('confirmvvv', voting)
 socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]}, voting)
 
-      let data = { room: [{ code }, { cards }, { user }, { socketId }] };
+      data = { room: [{ code }, { cards }, { user }, { socketId }] };
       console.log("dataz", data);
       // socket.emit('subFlagCard', data)
       $("#sign").bind("click", function () {
