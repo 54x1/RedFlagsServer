@@ -28,6 +28,7 @@ let pperkss;
 let gameData = []
 let game = []
 let voting
+let votingUser
 
 const clientRooms = {};
 app.use(express.static(publicPath));
@@ -65,12 +66,19 @@ client.on('timer', timerData)
 client.on('newTimer', newTimerData)
 // client.on('newRoundClean', newRoundClean)
 client.on('showFlag', showFlagHandle)
+client.on('votingUser', votingUserHandle)
 
 function showFlagHandle(newFlagArr, code){
   // client.emit('showFlag', newFlagArr)
   client.broadcast.to(code).emit('showFlag', newFlagArr)
 }
 
+function votingUserHandle(data, code){
+  votingUser = data
+  client.emit("votingUserData", votingUser, flagState)
+  client.broadcast.to(code).emit('votingUserData', votingUser, flagState)
+  console.log("votingUser", votingUser, code)
+}
 // function newRoundClean(code){
 //   flagState.filter(x=> x[0].code)
 //   client.emit('removeFlag')
@@ -86,8 +94,11 @@ function isVotingData(voting, code, flags){
   client.broadcast.to(code).emit('isVotingData', voting, flags)
 }
 function chooseWinnerData(data){
-  console.log("chooseWinnerDataa", data)
+
+  votingUser = data[0] 
+  client.emit('startVoteData', votingUser)
   client.broadcast.to(data[1]).emit('chooseWinnerDisplay', data[0])
+  console.log("chooseWinnerDataa", data, votingUser)
 }
 
 function timerData(data){
@@ -258,10 +269,11 @@ function handleNewGame() {
 
 function removeCardHandle(remCard, data){
   console.log("removeFlag", remCard, data)
-  client.emit('removeFlag', remCard[1])
+  client.emit('removeFlag', remCard)
     client.broadcast.to(remCard[1]).emit('removeFlag', remCard)
   client.emit('removeCardSelf', remCard, data)
   client.broadcast.to(remCard[1]).emit('removeCard', remCard, data)
+  
 }
 
 let prev = null
@@ -323,8 +335,8 @@ if (s == null){
 
 startv--
     console.log("astartv", startv, gameuser[startv].socketId, gameuser[startv],)
-    console.log("flagState_gameuser", flagState )
-    io.to(gameuser[startv].socketId).emit('startVote', flagState, gameuser[startv]);
+    console.log("flagState_gameuser", votingUser, flagState )
+    io.to(gameuser[startv].socketId).emit('startVote', flagState, gameuser[startv], votingUser);
 // userCount = 0
 gameuser = ""
 }else{
@@ -344,7 +356,6 @@ client.emit('userEmit', username, client.id)
 client.broadcast.to(username.code).emit('userJoinedDisplay', username.username.name)
 client.emit('userJoined',  username.username.name)
 username = ""
-
 }
 
 function newJoinFlagDataHandle(cards){
@@ -499,7 +510,7 @@ d.push(flagState)
 // }
 
 // f[0].room[3].
-client.emit('removeFlag', displayCode)
+// client.emit('removeFlag', displayCode)
 // console.log("res", res)
 })
 })
