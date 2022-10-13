@@ -296,7 +296,7 @@ function chooseWinnerDisplay(data) {
   }
 
 
-  if (voting === true){
+  if (voting === true && votingUser === $('.user span').html()){
     $(".public-flags .card-section").css({
       "background-color": "#c82333",
       "color": "white",
@@ -460,7 +460,7 @@ function removeFlagDataSelf(data) {
   
   // newDa.filter(ff=>ff.filter(f=>console.log("fff", f.room[0].code[0].code !== data[0])))
   );
-da = newDa.filter(ff=>ff.room[0].code[0].code!== data[1])
+da = newDa.filter(ff=>ff[0].room[0].code[0].code!== data[1])
 // newDa.filter(ff=>ff.includes(f=>f.room[0].code[0].code !== data[1]));
 
 // let empty = {room:[{code: code}, {voting: data}]}
@@ -616,7 +616,7 @@ function startVoteData(data, gameuser) {
   console.log("voting time", voting, data, gameuser );
 socketIdData = gameuser.socketId
 if (voting === true){
-  da = data
+  // da.push(data)
   socket.emit("isVoting", voting, gameCodeDisplay.innerText, data);
   socket.emit('votingUser', votingUser,  gameCodeDisplay.innerText, data)
   $('.public-flags>*').remove()
@@ -652,7 +652,7 @@ function voteUser(data, flag){
       console.log("data=", data, $(this).html())
       if ($('.user span').html() === data && $('.public-flags .card-section').css("background-color") === 'rgb(200, 35, 51)') {
         let cardz = $(this).html()
-        let  newflag = da
+        let  newflag = da.filter(value => Object.keys(value).length !== 0)
 //         console.log('zz' , flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0).length, flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0))
 //         if (flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0).length > 0){
 //  newflag = flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0)
@@ -662,12 +662,13 @@ function voteUser(data, flag){
   //  
         // let newflag = flag
     
-        console.log("dataa_click", da, newflag.filter(f=>console.log("f", f)))
+        console.log("dataa_click", newflag, newflag.filter(f=>console.log("f", f)))
          console.log(
-        newflag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === $(this).html()).map(m=>m.room[0].code[2].user))
+        newflag.filter(f=>f[0].room[0].code[0].code === gameCodeDisplay.innerText && f[0].room[0].code[1].cards === $(this).html()).map(m=>m[0].room[0].code[2].user)
+        )
        
     // if (flag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === String(cardz)).map(m=>m.room[0].code[2].user).length > 0){
-      let remCard = [cardz, gameCodeDisplay.innerText, newflag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === $(this).html()).map(m=>m.room[0].code[2].user)];
+      let remCard = [cardz, gameCodeDisplay.innerText,      newflag.filter(f=>f[0].room[0].code[0].code === gameCodeDisplay.innerText && f[0].room[0].code[1].cards === $(this).html()).map(m=>m[0].room[0].code[2].user)];
       socket.emit("removeCard", remCard);
       console.log("remCard", remCard)
     // }
