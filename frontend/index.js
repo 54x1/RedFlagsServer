@@ -67,6 +67,7 @@ socket.on("removeCardSelf", removeCardSelf);
 socket.on("newFlagCard", newFlagCard);
 socket.on("playerdc", playerdc);
 socket.on("removeFlag", removeFlagData);
+socket.on("removeFlagSelf",removeFlagDataSelf)
 socket.on("userJoined", userJoinedData);
 socket.on("userJoinedDisplay", userJoinedDisplay);
 // socket.on('leaderboardDisplayData', leaderboardDisplayData)
@@ -259,49 +260,18 @@ da = da.filter(e => e.room[0].code[0].code !== data[1]);
 // a.forEach(f => da.splice(da.findIndex(e => e.room[0].code[0].code === f.room[0].code[0].code),1));
 
 console.log("removeFlagData", da );
- 
-// function removeItemAll(arr, value) {
-//   var i = 0;
-//   while (i < arr.length) {
-//     if (arr[i] === value) {
-//       arr.splice(i, 1);
-//     } else {
-//       ++i;
-//     }
-//   }
-//   return arr;
-// }
-
-//   da.filter(
-//     (e) => e.room[0].code[0].code.code === gameCodeDisplay.innerText && e.room[0].code[1].cards.cards !== data
-//   );
-
-
-// //   b
-// //   c
-//   console.log("datad", da.filter(
-//     (e) => e.room[0].code[0].code.code === gameCodeDisplay.innerText && e.room[0].code[1].cards.cards !== data[0].room[0].code[1].cards.cards
-//   ))
-// if (d[0].length > 0){
-//   for  (let i = 0; i < d[0].length; i++) {
-//   c = d.filter(
-//     (e) => e[i][0].code.code === gameCodeDisplay.innerText
-//   );
-//   c.forEach((f) =>
-//     d.splice(
-//       d.findIndex(
-//         (e) =>  e[i][0].code.code === f[i][0].code.code
-//       ),
-//       1
-//     )
-//   );
-//   }
-// }
-
-  // da.filter(cc => cc.room[0].code[0].code.code === gameCodeDisplay.innerText).remove(cc.room[0].code[1].cards.cards)
 
 }
 
+function removeFlagDataSelf(data) {
+  console.log('removeFlagDataSelf1', data)
+  console.log("removeFlagDataSelf2", da );
+  da = da.filter(e => e.room[0].code[0].code !== data[1]);
+  // a.forEach(f => da.splice(da.findIndex(e => e.room[0].code[0].code === f.room[0].code[0].code),1));
+  
+  console.log("removeFlagDataSelf3", da );
+  
+  }
 function playerdc(displayUser) {
   console.log("playerdc_here", displayUser);
 
@@ -370,7 +340,7 @@ function removeCard(remCard, data) {
 }
 
 function removeCardSelf(remCard, data) {
-  // $('.red-flag-row').html('<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>')
+  // $('.red-flag-row').html('<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger fas fa-plus"></i></p></div></div>')
   console.log("remdaat", remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
   console.log("bb[0]_self", String(remCard[0]));
   console.log("dd[1]_self", String(remCard[1]));
@@ -414,11 +384,11 @@ function newFlagCard() {
   $("#sign").css({ cursor: "pointer" });
   $(".public-flags").hide();
   $(".public-flags .card-section").remove();
-  $("#sign").html('<i class="text-danger far fa-plus-square"></i>');
+  $("#sign").html('<i class="text-danger fas fa-plus"></i>');
   console.log("end newflagcard here");
 
   $(".red-flag-row").html(
-    '<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>'
+    '<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger fas fa-plus"></i></p></div></div>'
   );
   socket.emit("newRoundClear", code);
   voting = false
@@ -435,11 +405,11 @@ $(document).on("click", "#new-red-flags-next-game", function () {
   console.log("fd", d)
   socket.emit("newRound", code, d);
   socket.emit("newRoundClear", code);
-  socket.emit('newTimer', [code, timerRand])
+  // socket.emit('newTimer', [code, timerRand])
   console.log("clicked right here");
   $(this).remove();
   $(".red-flag-row").html(
-    '<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger far fa-plus-square"></i></p></div></div>'
+    '<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger fas fa-plus"></i></p></div></div>'
   );
   $("#new-red-flags-next-game").remove();
   $('.red-flag-msg').remove()
@@ -511,8 +481,8 @@ if (voting === true){
 userCardData = ""
 }
 function voteUser(data, flag){
-  $(".public-flags .card-section").each(function (){
-    $(this).on("click", function(){
+  console.log("voteuser")
+     $(document).on("click", ".public-flags .card-section", function(){
 
       console.log("data=", data, $(this).html())
       if ($('.user span').html() === data) {
@@ -527,13 +497,12 @@ function voteUser(data, flag){
           "background-color": "white",
           color: "black",
         });
-        $("#gameScreen .red-flag-row .red-flag-msg").remove();
+        $("#new-red-flags-next-game, .red-flag-msg").remove();
         $("#gameScreen .red-flag-row").append(
           '<div id="new-red-flags-next-game" class="btn btn-danger"><span class="title">Next Round</span><i class="bottom-right fas fa-arrow-right"></i></div>'
         );
       }
         })
-  })
 
   }
 function votingUserData(data){
@@ -699,7 +668,7 @@ $("#genNewUser").click(function () {
 });
 socket.on("disconnect", () => {
 
-  console.log("here", displayUser);
+  console.log("disconnect", displayUser);
   socket.emit("newRoundClear", gameCodeDisplay.innerText);
   // socket.emit('playerDis', displayUser)
   $(".alert").fadeIn();
@@ -733,7 +702,7 @@ function newFlagData(data, voting) {
       return false;
     });
     $("#sign").css({ cursor: "not-allowed" });
-    $("#sign").html('<i class="text-secondary far fa-plus-square"></i>');
+    $("#sign").html('<i class="text-secondary fas fa-plus"></i>');
   } else {
     $("#sign").unbind("click");
     $("#sign").css({ cursor: "pointer" });
@@ -818,7 +787,6 @@ function subFlagDataSelf(data) {
       newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
     }
   if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
-    console.log("here")
     newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>")+"")
     }
   
@@ -887,7 +855,6 @@ function subFlagData(data) {
         newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
       }
     if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
-      console.log("here")
       newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>")+"")
       }
     }
@@ -1060,7 +1027,7 @@ function startTimer(duration) {
   }, 1000);
 }
 
-$(document).on("click", ".fa-plus-square", function () {
+$(document).on("click", ".fa-plus", function () {
   $(".game-container").hide();
   $(".flag-section").show();
   $(".public-flags").css({ display: "flex" });
@@ -1135,7 +1102,7 @@ socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]}, voting)
         return false;
       });
       $("#sign").css({ cursor: "not-allowed" });
-      $("#sign").html('<i class="text-secondary far fa-plus-square"></i>');
+      $("#sign").html('<i class="text-secondary fas fa-plus"></i>');
 
 
      $('.flag-section .card-section').each(function (){

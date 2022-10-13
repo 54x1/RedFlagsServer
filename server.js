@@ -63,7 +63,7 @@ client.on("leaderboard", leaderboardData)
 client.on('chooseWinner', chooseWinnerData )
 client.on('isVoting', isVotingData)
 client.on('timer', timerData)
-client.on('newTimer', newTimerData)
+// client.on('newTimer', newTimerData)
 // client.on('newRoundClean', newRoundClean)
 client.on('showFlag', showFlagHandle)
 client.on('votingUser', votingUserHandle)
@@ -76,7 +76,7 @@ function showFlagHandle(newFlagArr, code){
 function votingUserHandle(data, code){
   votingUser = data
   client.emit("votingUserData", votingUser, flagState)
-  client.broadcast.to(code).emit('votingUserData', votingUser, flagState)
+  // client.broadcast.to(code).emit('votingUserData', votingUser, flagState)
   console.log("votingUser", votingUser, code)
 }
 // function newRoundClean(code){
@@ -94,10 +94,11 @@ function isVotingData(voting, code, flags){
   client.broadcast.to(code).emit('isVotingData', voting, flags)
 }
 function chooseWinnerData(data){
-
+  // startVoteData
+  // chooseWinnerDisplay
   votingUser = data[0] 
-  client.emit('startVoteData', votingUser)
-  client.broadcast.to(data[1]).emit('chooseWinnerDisplay', data[0])
+  client.emit('chooseWinnerDisplay', votingUser)
+  client.broadcast.to(data[1]).emit('startVoteData', votingUser)
   console.log("chooseWinnerDataa", data, votingUser)
 }
 
@@ -269,7 +270,7 @@ function handleNewGame() {
 
 function removeCardHandle(remCard, data){
   console.log("removeFlag", remCard, data)
-  client.emit('removeFlag', remCard)
+  client.emit('removeFlagSelf', remCard)
     client.broadcast.to(remCard[1]).emit('removeFlag', remCard)
   client.emit('removeCardSelf', remCard, data)
   client.broadcast.to(remCard[1]).emit('removeCard', remCard, data)
