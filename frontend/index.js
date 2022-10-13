@@ -815,7 +815,7 @@ function subFlagDataSelf(data) {
             $('.public-flags>*').remove()
     if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length > 0){
       $('.public-flags').append("<div class='card-section text-center'>"+
-      newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"xxx</div>")  
+      newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
     }
   if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
     console.log("here")
@@ -884,7 +884,7 @@ function subFlagData(data) {
               $('.public-flags>*').remove()
       if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length > 0){
         $('.public-flags').append("<div class='card-section text-center'>"+
-        newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"xxx</div>")  
+        newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
       }
     if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
       console.log("here")
