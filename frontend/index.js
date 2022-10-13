@@ -1,5 +1,5 @@
-let socket = io();
-// const socket = io('https://red-flags-server.herokuapp.com/')
+// let socket = io();
+const socket = io('https://red-flags-server.herokuapp.com/')
 let pppperksss;
 let cards;
 const username = {};
@@ -546,7 +546,7 @@ function namesData() {
       "dawn",
       "crimson",
       "wispy",
-      "weathered",
+      "weathering",
       "blue",
       "billowing",
       "broken",
@@ -571,20 +571,20 @@ function namesData() {
       "throbbing",
       "shy",
       "wandering",
-      "withered",
+      "withering",
       "wild",
       "black",
       "young",
       "holy",
       "solitary",
       "fragrant",
-      "aged",
+      "aging",
       "snowy",
       "proud",
       "floral",
       "restless",
       "divine",
-      "polished",
+      "polishing",
       "ancient",
       "purple",
       "lively",
@@ -659,7 +659,7 @@ function namesData() {
 
   return (
     adjs[Math.floor(Math.random() * (adjs.length - 1))] +
-    "_" +
+    "-" +
     nouns[Math.floor(Math.random() * (nouns.length - 1))]
   );
 }
