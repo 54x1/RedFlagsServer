@@ -30,7 +30,7 @@ const perk1 = document.getElementById("perk1");
 const perk2 = document.getElementById("perk2");
 newGameBtn.addEventListener("click", newGame);
 newPerks.addEventListener("click", newPerksFunc);
-
+usernameGen();
 $(".loginForm").submit(function (e) {
   e.preventDefault();
 });
@@ -79,6 +79,7 @@ socket.on("vote", vote)
 socket.on("randTime", randTimeData)
 socket.on('showFlag', showFlag)
 socket.on('votingUserData', voteUser)
+socket.on('checkIsVotingData', checkIsVotingHandle)
 socket.on('testff', testff)
 
 
@@ -87,8 +88,162 @@ console.log(queryString);
 const search = new URLSearchParams(queryString);
 const code = search.get('code')
 console.log(code);
+function namesData() {
+  var adjs = [
+      "autumn",
+      "hidden",
+      "bitter",
+      "misty",
+      "silent",
+      "empty",
+      "dry",
+      "dark",
+      "summer",
+      "icy",
+      "delicate",
+      "quiet",
+      "white",
+      "cool",
+      "spring",
+      "winter",
+      "patient",
+      "twilight",
+      "dawn",
+      "crimson",
+      "wispy",
+      "weathering",
+      "blue",
+      "billowing",
+      "broken",
+      "cold",
+      "damp",
+      "falling",
+      "frosty",
+      "green",
+      "long",
+      "lucky",
+      "lingering",
+      "bold",
+      "little",
+      "morning",
+      "muddy",
+      "old",
+      "red",
+      "rough",
+      "still",
+      "small",
+      "sparkling",
+      "throbbing",
+      "shy",
+      "wandering",
+      "withering",
+      "wild",
+      "black",
+      "young",
+      "holy",
+      "solitary",
+      "fragrant",
+      "aging",
+      "snowy",
+      "proud",
+      "floral",
+      "restless",
+      "divine",
+      "polishing",
+      "ancient",
+      "purple",
+      "lively",
+      "nameless",
+    ],
+    nouns = [
+      "waterfall",
+      "river",
+      "breeze",
+      "moon",
+      "rain",
+      "wind",
+      "sea",
+      "morning",
+      "snow",
+      "lake",
+      "sunset",
+      "pine",
+      "shadow",
+      "leaf",
+      "dawn",
+      "glitter",
+      "forest",
+      "hill",
+      "cloud",
+      "meadow",
+      "sun",
+      "glade",
+      "bird",
+      "brook",
+      "butterfly",
+      "bush",
+      "dew",
+      "dust",
+      "field",
+      "fire",
+      "flower",
+      "firefly",
+      "feather",
+      "grass",
+      "haze",
+      "mountain",
+      "night",
+      "pond",
+      "darkness",
+      "snowflake",
+      "sliver",
+      "sound",
+      "sky",
+      "shape",
+      "town",
+      "thunder",
+      "violet",
+      "water",
+      "wildflower",
+      "wave",
+      "water",
+      "resonance",
+      "sun",
+      "wood",
+      "dream",
+      "cherry",
+      "tree",
+      "fog",
+      "frost",
+      "voice",
+      "paper",
+      "frog",
+      "smoke",
+      "star",
+    ];
 
+  return (
+    adjs[Math.floor(Math.random() * (adjs.length - 1))] +
+    "-" +
+    nouns[Math.floor(Math.random() * (nouns.length - 1))]
+  );
+}
+$("#genNewUser").click(function () {
+  usernameGen();
+});
+function usernameGen() {
+  var id = namesData() + new Date().getUTCMilliseconds();
+
+  displayUser = id;
+  $(".user span").html(displayUser);
+  // let code = gameCodeDisplay.innerText
+  // let username =  displayUser
+  // let socketId = socket.id
+  // socket.emit("newUser", { socketId, code , username });
+  return id
+}
 if (code){
+  usernameGen();
   $('#login-section').hide()
   $('#initialScreen').show()
   $('#gameCodeInput').val(code)
@@ -97,6 +252,11 @@ if (code){
 function testff(data) {
   console.log("datatestff", data)
 
+}
+
+function checkIsVotingHandle(data){
+voting = data
+console.log('votingzzz', data)
 }
 
 function showFlag() {
@@ -125,11 +285,26 @@ timerRand = data
 function chooseWinnerDisplay(data) {
   votingUser = data
   console.log("voting_user", data);
+  if ($('.user span').html() !== data){
   $(".red-flag-row").html(
     "<p class='red-flag-msg'><b>'" + data + "'" + " is choosing</b></p>"
   );
+  }else{
+    $(".red-flag-row").html(
+      "<p class='red-flag-msg'><b>YOU are choosing</b></p>"
+    ); 
+  }
 
-socket.emit('votingUser', votingUser, gameCodeDisplay.innerText)
+
+  if (voting === true){
+    $(".public-flags .card-section").css({
+      "background-color": "#c82333",
+      "color": "white",
+    });
+  }
+
+  console.log('daaa', da)
+socket.emit('votingUser', votingUser, gameCodeDisplay.innerText, da)
 
 }
 
@@ -281,9 +456,12 @@ function removeFlagDataSelf(data) {
   console.log('removeFlagDataSelf1', data, voting)
   let newDa = da.filter(value => Object.keys(value).length !== 0)
   
-  console.log("removeFlagDataSelf2", da, newDa.filter(value => Object.keys(value).length !== 0),newDa.filter(ff=>ff.filter(f=>console.log("fff", f.room[0].code[0].code !== data[0])))
+  console.log("removeFlagDataSelf2", da, newDa.filter(value => Object.keys(value).length !== 0), newDa
+  
+  // newDa.filter(ff=>ff.filter(f=>console.log("fff", f.room[0].code[0].code !== data[0])))
   );
-da = newDa.filter(ff=>ff.includes(f=>f.room[0].code[0].code !== data[1]));
+da = newDa.filter(ff=>ff.room[0].code[0].code!== data[1])
+// newDa.filter(ff=>ff.includes(f=>f.room[0].code[0].code !== data[1]));
 
 // let empty = {room:[{code: code}, {voting: data}]}
 socket.emit("checkIsVoting", gameCodeDisplay.innerText, voting)
@@ -292,15 +470,15 @@ socket.emit("checkIsVoting", gameCodeDisplay.innerText, voting)
   console.log("removeFlagDataSelf3", da );
   
   }
-function playerdc(displayUser) {
-  console.log("playerdc_here", displayUser);
+function playerdc(data) {
+  console.log("playerdc_here", data);
 
   // socket.emit('playerDis', displayUser)
   $(".alert").fadeIn();
 
   $(".alert").append(
     "<div class='alert-secondary' role='alert'>" +
-      displayUser +
+    data +
       " has left</div>"
   );
   $(".alert-secondary")
@@ -310,12 +488,12 @@ function playerdc(displayUser) {
       $(".alert").hide(200);
     })
     $(".alert-secondary").fadeOut(1000)
-  console.log("playerdc", displayUser);
+  console.log("playerdc", data);
   // socket.emit("player", displayUser, gameCodeDisplay.innerText);
   console.log("pfunc", $(".leaderboard-section mark").text());
 
   $(".leaderboard-section mark").each(function () {
-    if ($(this).text() === displayUser) {
+    if ($(this).text() === data) {
       $(this).parent().remove();
     }
   });
@@ -336,11 +514,10 @@ function removeCard(remCard, data) {
   $("#gameScreen .public-flags").before(
     '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
   }
-  // else{
-  //   $("#gameScreen .public-flags").before(
-  //     '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
-  //   );
-  // }
+  else{
+    $("#gameScreen .public-flags").before(
+      '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
+    }
 
 
     $('.public-flags>*').remove()
@@ -373,11 +550,10 @@ function removeCardSelf(remCard, data) {
     $("#gameScreen .public-flags").before(
       '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
     }
-    // else{
-    //   $("#gameScreen .public-flags").before(
-    //     '<p class="red-flag-msg"><b>'+data.filter(f=>f[0].code === String(remCard[1])).map(m=>m[2].user)+' has the winning FLAG</b></p>'
-    //   );
-    // }
+    else{
+      $("#gameScreen .public-flags").before(
+        '<p class="red-flag-msg"><b>'+String(remCard[2])+' has the winning FLAG</b></p>')
+    }
   $(".public-flags .card-section").each(function () {
     let remName = $(this).html();
     if (remName !== String(remCard[0])) {
@@ -435,21 +611,20 @@ $(document).on("click", "#new-red-flags-next-game", function () {
   $('.red-flag-msg').remove()
 });
 
-function startVoteData(data, gameuser, userCardData, votingUser) {
+function startVoteData(data, gameuser) {
   voting = true;
   console.log("voting time", voting, data, gameuser );
 socketIdData = gameuser.socketId
 if (voting === true){
+  da = data
   socket.emit("isVoting", voting, gameCodeDisplay.innerText, data);
+  socket.emit('votingUser', votingUser,  gameCodeDisplay.innerText, data)
   $('.public-flags>*').remove()
   data.filter(f=>f.room[0].code[2].user !== $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
  m +"</div>"))
  data.filter(f=>f.room[0].code[2].user === $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
  m +"</div>"))
- $(".public-flags .card-section").css({
-  "background-color": "#c82333",
-  color: "white",
-});
+
  }else{
    console.log("elsedata", data)
  
@@ -468,26 +643,44 @@ if (voting === true){
   );
 
 
-
-// userCardData = ""
+socket.emit('voteUser',votingUser, data)
 }
 function voteUser(data, flag){
-  console.log("voteuser")
+  console.log("voteuserzzzz", data, flag)
      $(document).on("click", ".public-flags .card-section", function(){
 
       console.log("data=", data, $(this).html())
       if ($('.user span').html() === data && $('.public-flags .card-section').css("background-color") === 'rgb(200, 35, 51)') {
         let cardz = $(this).html()
+        let  newflag = da
+//         console.log('zz' , flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0).length, flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0))
+//         if (flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0).length > 0){
+//  newflag = flag.filter(value => value.filter(f=> f.room[0].code[0].code === gameCodeDisplay.innerText ) && Object.keys(value).length !== 0)
+//         }else{
+          
+        // }
+  //  
+        // let newflag = flag
     
-        console.log("dataa_click", flag, cardz)
+        console.log("dataa_click", da, newflag.filter(f=>console.log("f", f)))
+         console.log(
+        newflag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === $(this).html()).map(m=>m.room[0].code[2].user))
+       
+    // if (flag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === String(cardz)).map(m=>m.room[0].code[2].user).length > 0){
+      let remCard = [cardz, gameCodeDisplay.innerText, newflag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === $(this).html()).map(m=>m.room[0].code[2].user)];
+      socket.emit("removeCard", remCard);
+      console.log("remCard", remCard)
+    // }
     
-        let remCard = [cardz, gameCodeDisplay.innerText, flag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === String(cardz)).map(m=>m.room[0].code[2].user)];
-        console.log("remCard", remCard)
-        socket.emit("removeCard", remCard, flag);
+    
+// 
+if (voting === true){
         $(".public-flags .card-section").css({
           "background-color": "white",
-          color: "black",
+          "color": "black",
         });
+      }
+      // }
         $("#new-red-flags-next-game, .red-flag-msg").remove();
         $("#gameScreen .red-flag-row").append(
           '<div id="new-red-flags-next-game" class="btn btn-danger"><span class="title">Next Round</span><i class="bottom-right fas fa-arrow-right"></i></div>'
@@ -502,181 +695,15 @@ function votingUserData(data){
 
 }
 
-usernameGen();
+
 // function displayName(data){
 // 	console.log("dataxxxx", data)
 // }
 
-function usernameGen() {
-  var id = namesData() + new Date().getUTCMilliseconds();
 
-  displayUser = id;
-  $(".user span").html(displayUser);
-}
 
-function namesData() {
-  var adjs = [
-      "autumn",
-      "hidden",
-      "bitter",
-      "misty",
-      "silent",
-      "empty",
-      "dry",
-      "dark",
-      "summer",
-      "icy",
-      "delicate",
-      "quiet",
-      "white",
-      "cool",
-      "spring",
-      "winter",
-      "patient",
-      "twilight",
-      "dawn",
-      "crimson",
-      "wispy",
-      "weathering",
-      "blue",
-      "billowing",
-      "broken",
-      "cold",
-      "damp",
-      "falling",
-      "frosty",
-      "green",
-      "long",
-      "lucky",
-      "lingering",
-      "bold",
-      "little",
-      "morning",
-      "muddy",
-      "old",
-      "red",
-      "rough",
-      "still",
-      "small",
-      "sparkling",
-      "throbbing",
-      "shy",
-      "wandering",
-      "withering",
-      "wild",
-      "black",
-      "young",
-      "holy",
-      "solitary",
-      "fragrant",
-      "aging",
-      "snowy",
-      "proud",
-      "floral",
-      "restless",
-      "divine",
-      "polishing",
-      "ancient",
-      "purple",
-      "lively",
-      "nameless",
-    ],
-    nouns = [
-      "waterfall",
-      "river",
-      "breeze",
-      "moon",
-      "rain",
-      "wind",
-      "sea",
-      "morning",
-      "snow",
-      "lake",
-      "sunset",
-      "pine",
-      "shadow",
-      "leaf",
-      "dawn",
-      "glitter",
-      "forest",
-      "hill",
-      "cloud",
-      "meadow",
-      "sun",
-      "glade",
-      "bird",
-      "brook",
-      "butterfly",
-      "bush",
-      "dew",
-      "dust",
-      "field",
-      "fire",
-      "flower",
-      "firefly",
-      "feather",
-      "grass",
-      "haze",
-      "mountain",
-      "night",
-      "pond",
-      "darkness",
-      "snowflake",
-      "sliver",
-      "sound",
-      "sky",
-      "shape",
-      "town",
-      "thunder",
-      "violet",
-      "water",
-      "wildflower",
-      "wave",
-      "water",
-      "resonance",
-      "sun",
-      "wood",
-      "dream",
-      "cherry",
-      "tree",
-      "fog",
-      "frost",
-      "voice",
-      "paper",
-      "frog",
-      "smoke",
-      "star",
-    ];
 
-  return (
-    adjs[Math.floor(Math.random() * (adjs.length - 1))] +
-    "-" +
-    nouns[Math.floor(Math.random() * (nouns.length - 1))]
-  );
-}
-$("#genNewUser").click(function () {
-  usernameGen();
-});
-socket.on("disconnect", () => {
 
-  console.log("disconnect", displayUser);
-  socket.emit("newRoundClear", gameCodeDisplay.innerText);
-  // socket.emit('playerDis', displayUser)
-  $(".alert").fadeIn();
-
-  $(".alert").append(
-    "<div class='alert-secondary' role='alert'>YOU have left the game!</div>"
-  );
-  // $(".alert-secondary")
-  //   .fadeTo(1300, 300)
-  //   .slideUp(300, function () {
-  //     $(".alert-secondary").slideUp(300);
-  //     $(".alert").hide(200);
-  //   });
-    // $(".alert-secondary").fadeOut(1000)  
-  socket.emit("player", displayUser, gameCodeDisplay.innerText);
-  // window.location = '/'
-});
 
 // function newUserData(data, c){
 
@@ -1058,6 +1085,7 @@ console.log("difference", difference)
       let user = $(".user span").html();
         console.log('confirmvvv', voting)
 socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]}, voting)
+// socket.emit('FlagCards', {room:[{code},{cards},{user}, {socketId}]}, voting)
 
       let data = { room: [{ code }, { cards }, { user }, { socketId }] };
       console.log("dataz", data);
@@ -1149,6 +1177,7 @@ function handleNewPerks(data) {
 
 // console.log();
 function newGame() {
+
   socket.emit("newGame");
 
   // perk();
@@ -1182,7 +1211,7 @@ $(loginGameBtn).on("click", function () {
   // let userCount = 1
   // getRandomInt(userCount)
   user = displayUser;
-  console.log("displayUser", displayUser);
+  console.log("displayUserlgbtn", displayUser);
   if (user) {
     loginSection.style.display = "none";
     initialScreen.style.display = "block";
@@ -1191,6 +1220,10 @@ $(loginGameBtn).on("click", function () {
   }
 });
 $(joinGameBtn).on("click", function () {
+  user = displayUser;
+  console.log("displayUserjgbtn", displayUser);
+  username["name"] = user;
+  console.log("username", username);
   const code = gameCodeInput.value;
   console.log("votinginit", voting)
   socket.emit("joinGame", code, voting);
@@ -1215,7 +1248,7 @@ window.history.pushState({ path: url }, '', url);
   $(gameCodeDisplay).html(roomName);
   $(perk1).html($(gamePerk1).val());
   socket.emit("perks");
-
+let username = displayUser
   let socketId = socket.id;
   socket.emit("newUser", { socketId, code, username });
   console.log("votingin", voting)
@@ -1305,3 +1338,25 @@ function reset() {
   initialScreen.style.display = "block";
   gameScreen.style.display = "none";
 }
+
+
+socket.on("disconnect", () => {
+console.log("disss", displayUser)
+  console.log("disconnect", $('.user span').html());
+  socket.emit("newRoundClear", gameCodeDisplay.innerText);
+  // socket.emit('playerDis', displayUser)
+  $(".alert").fadeIn();
+
+  $(".alert").append(
+    "<div class='alert-secondary' role='alert'>YOU have left the game!</div>"
+  );
+  // $(".alert-secondary")
+  //   .fadeTo(1300, 300)
+  //   .slideUp(300, function () {
+  //     $(".alert-secondary").slideUp(300);
+  //     $(".alert").hide(200);
+  //   });
+    // $(".alert-secondary").fadeOut(1000)  
+  socket.emit("player", displayUser, gameCodeDisplay.innerText);
+  // window.location = '/'
+});

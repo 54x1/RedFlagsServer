@@ -62,7 +62,7 @@ client.on("leaderboard", leaderboardData)
 // client.on('RandomCard', RandomCardData)
 client.on('chooseWinner', chooseWinnerData )
 client.on('isVoting', isVotingData)
-client.on('timer', timerData)
+// client.on('timer', timerData)
 // client.on('newTimer', newTimerData)
 // client.on('newRoundClean', newRoundClean)
 client.on('showFlag', showFlagHandle)
@@ -72,17 +72,20 @@ client.on('checkIsVoting', checkIsVoting)
 function checkIsVoting(code, data){
 console.log("checkIsVotingData", code, data)
 client.emit('checkIsVotingData', data)
+client.broadcast.to(code).emit('checkIsVotingData', data)
 }
 function showFlagHandle(newFlagArr, code){
   // client.emit('showFlag', newFlagArr)
   client.broadcast.to(code).emit('showFlag', newFlagArr)
 }
 
-function votingUserHandle(data, code){
+function votingUserHandle(data, code, flag){
+  console.log("votingUser", data, flagState, flag)
+  client.emit("testff", {flagState, flag})
   votingUser = data
-  client.emit("votingUserData", votingUser, flagState)
-  // client.broadcast.to(code).emit('votingUserData', votingUser, flagState)
-  console.log("votingUser", votingUser, code)
+  client.emit("votingUserData", votingUser, flag)
+  client.broadcast.to(code).emit('votingUserData', votingUser, flag)
+  // console.log("votingUser", votingUser, code)
 }
 // function newRoundClean(code){
 //   flagState.filter(x=> x[0].code)
@@ -95,7 +98,7 @@ rArr.filter(d => d)
 }
 function isVotingData(voting, code, flags){
   console.log("voting", voting)
-  // client.emit('isVotingData', voting, flags)
+  client.emit('isVotingData', voting, flags)
   client.broadcast.to(code).emit('isVotingData', voting, flags)
 }
 function chooseWinnerData(data){
@@ -103,6 +106,8 @@ function chooseWinnerData(data){
   // chooseWinnerDisplay
   votingUser = data[0] 
   client.emit('chooseWinnerDisplay', votingUser)
+  client.broadcast.to(data[1]).emit('chooseWinnerDisplay', votingUser)
+  client.emit('startVoteData', votingUser)
   client.broadcast.to(data[1]).emit('startVoteData', votingUser)
   console.log("chooseWinnerDataa", data, votingUser)
 }
@@ -357,10 +362,10 @@ function newUserHandle(username){
   console.log("usernamevv1", username)
 users[client.id] = username 
 
-console.log("usernamez1", username.username.name)
+console.log("usernamez1", username.username)
 client.emit('userEmit', username, client.id)
-client.broadcast.to(username.code).emit('userJoinedDisplay', username.username.name)
-client.emit('userJoined',  username.username.name)
+client.broadcast.to(username.code).emit('userJoinedDisplay', username.username)
+client.emit('userJoined',  username.username)
 username = ""
 }
 
@@ -393,12 +398,13 @@ function newJoinFlagHandle(code, voting){
 function FlagCardsHandle(data, voting){
   console.log("subFlagDataHDCH", data)
   console.log('FlagCardsHandle', voting)
-  client.emit('testff', voting)
-  if (data.room[1].cards !== "" ){
+  client.emit('testff', data)
+  // if (data){
       let code = data.room[0].code
       let cards = data.room[1].cards
       let user = data.room[2].user
       let socketId = data.room[3].socketId
+      console.log("userzzz", user)
 // push data to global list 
     flagState.push({room:[{code:[{code},{cards},{user}, {socketId}]}]})
     console.log("flagStatepush",  flagState[0])
@@ -406,7 +412,7 @@ function FlagCardsHandle(data, voting){
     console.log("codeStrzzz", codeStr)
      client.emit('subFlagDataSelf', {room:[{code:[{code},{cards},{user}, {socketId}]}]})
     client.broadcast.to(codeStr).emit('subFlagData', {room:[{code:[{code},{cards},{user},{socketId}]}]})
-}
+// }
 }
 // function subFlagCardHandle(data){
 //   console.log("subFlagDataSFCH", data)
@@ -481,6 +487,9 @@ let displayCode
    
    playerdc = displayUser
    displayCode = code
+   
+  client.emit('playerdc', playerdc);
+
   client.broadcast.to(displayCode).emit('playerdc', playerdc);
    console.log('called playerDC', displayCode, playerdc)
    return displayCode, playerdc;
@@ -502,7 +511,8 @@ let name = Object.values(users)
 console.log("playerdccc", users[client.id])
 if (users[client.id]){
   flagState = flagState.filter(e => e.room[0].code[0].code !== users[client.id].code)
-client.broadcast.to(users[client.id].code).emit('playerdc', users[client.id].username.name)
+client.broadcast.to(users[client.id].code).emit('playerdc', users[client.id].username)
+client.emit('playerdc', users[client.id].username)
 }
 delete users[client.id]
 console.log('nameee2', name)
