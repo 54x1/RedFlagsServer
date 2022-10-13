@@ -1,5 +1,5 @@
-// let socket = io();
-const socket = io('https://red-flags-server.herokuapp.com/')
+let socket = io();
+// const socket = io('https://red-flags-server.herokuapp.com/')
 let pppperksss;
 let cards;
 const username = {};
@@ -80,6 +80,19 @@ socket.on("randTime", randTimeData)
 socket.on('showFlag', showFlag)
 socket.on('votingUserData', voteUser)
 socket.on('testff', testff)
+
+
+const queryString = window.location.search;
+console.log(queryString);
+const search = new URLSearchParams(queryString);
+const code = search.get('code')
+console.log(code);
+
+if (code){
+  $('#login-section').hide()
+  $('#initialScreen').show()
+  $('#gameCodeInput').val(code)
+}
 
 function testff(data) {
   console.log("datatestff", data)
@@ -463,7 +476,7 @@ function voteUser(data, flag){
      $(document).on("click", ".public-flags .card-section", function(){
 
       console.log("data=", data, $(this).html())
-      if ($('.user span').html() === data) {
+      if ($('.user span').html() === data && $('.public-flags .card-section').css("background-color") === 'rgb(200, 35, 51)') {
         let cardz = $(this).html()
     
         console.log("dataa_click", flag, cardz)
@@ -1195,6 +1208,9 @@ let playerNumber;
 let gameActive = false;
 
 function init(roomName, voting) {
+  let url = `/?code=${roomName}`
+window.history.pushState({ path: url }, '', url);
+  
   const code = roomName;
   $(gameCodeDisplay).html(roomName);
   $(perk1).html($(gamePerk1).val());
@@ -1224,18 +1240,10 @@ function init(roomName, voting) {
     var randInt2 = Math.floor(Math.random() * data.flags.length);
     var randInt3 = Math.floor(Math.random() * data.flags.length);
     var randInt4 = Math.floor(Math.random() * data.flags.length);
-    $(".flags >.card-section:first-child")
-      .html("")
-      .append(data.flags[randInt].card);
-    $(".flags >.card-section:nth-child(2)")
-      .html("")
-      .append(data.flags[randInt2].card);
-    $(".flags >.card-section:nth-child(3)")
-      .html("")
-      .append(data.flags[randInt3].card);
-    $(".flags >.card-section:last-child")
-      .html("")
-      .append(data.flags[randInt4].card);
+    $(".flags >.card-section:first-child").html("").append(data.flags[randInt].card);
+    $(".flags >.card-section:nth-child(2)").html("").append(data.flags[randInt2].card);
+    $(".flags >.card-section:nth-child(3)").html("").append(data.flags[randInt3].card);
+    $(".flags >.card-section:last-child").html("").append(data.flags[randInt4].card);
     // $('.card-section>p:nth-child(3)').append(data.flags[randInt2].card);
   });
 
