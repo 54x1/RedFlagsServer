@@ -228,9 +228,7 @@ function namesData() {
     nouns[Math.floor(Math.random() * (nouns.length - 1))]
   );
 }
-$("#genNewUser").click(function () {
-  usernameGen();
-});
+
 function usernameGen() {
   var id = namesData() + new Date().getUTCMilliseconds();
 
@@ -242,6 +240,10 @@ function usernameGen() {
   // socket.emit("newUser", { socketId, code , username });
   return id
 }
+$("#genNewUser, #genNewUserEntered").click(function () {
+  usernameGen();
+  console.log("clicked gen user")
+});
 if (code){
   usernameGen();
   $('#login-section').hide()
