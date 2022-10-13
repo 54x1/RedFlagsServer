@@ -847,7 +847,7 @@ function subFlagData(data) {
       }
     if (newDa.filter(f=>f.filter(f=> f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[2].user)).length > 0){
       console.log("datav1===", newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)))
-      newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[1].cards +"xxx</div>")+""))
+      newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[1].cards +".</div>")+""))
       }
     }
 
