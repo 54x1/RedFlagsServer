@@ -1,5 +1,5 @@
-// let socket = io();
-const socket = io('https://red-flags-server.herokuapp.com/')
+let socket = io();
+// const socket = io('https://red-flags-server.herokuapp.com/')
 let pppperksss;
 let cards;
 const username = {};
@@ -54,7 +54,7 @@ socket.on("ppperks", handlePPerks);
 socket.on('unknownCode', handleUnknownCode);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 // socket.on('flagData', flagData);
-socket.on("subFlagData", subFlagDataSelf);
+socket.on("subFlagData", subFlagData);
 socket.on("subFlagDataSelf", subFlagDataSelf);
 // socket.on("unknownData", unknownData)
 // // socket.on("flagStateData", subFlagData)
@@ -102,9 +102,8 @@ function showFlag() {
 
 function vote(voting) {
  console.log("testvoting2", voting)
-
-// showFlagData = ''
-return voting
+voting = voting
+socket.emit("checkIsVoting", gameCodeDisplay.innerText, voting);
 }
 
 function randTimeData(data){
@@ -125,17 +124,17 @@ function isVotingData(voting, data) {
   console.log("isVotingData1", $(".user span").html(), voting, data);
   if (voting === true){
     $('.public-flags>*').remove()
-    data.filter(f=>f[2].user !== $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+    data.filter(f=>f.room[0].code[2].user !== $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
    m +"</div>"))
-   data.filter(f=>f[2].user === $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+   data.filter(f=>f.room[0].code[2].user === $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
    m +"</div>"))
    }else{
      console.log("elsedata", data)
    
    }
 
-
-  // socket.emit("voting", voting, gameCodeDisplay.innerText);
+voting = voting
+  socket.emit("voting", voting, gameCodeDisplay.innerText);
 }
 /*
 function subFlagDataRandom(data) {
@@ -255,18 +254,26 @@ $(document).on("click", ".fa-trophy", function () {
 
 function removeFlagData(data) {
 console.log('removeFlagDataz', data)
-console.log("dadada", da );
-da = da.filter(e => e.room[0].code[0].code !== data[1]);
+let newDa = da.filter(value => Object.keys(value).length !== 0)
+ 
+console.log("dadada", da, newDa.filter(e => e.filter(f=>f.room[0].code[0].code !== data[1])));
+ da = newDa.filter(ee => ee.includes(f=>f.room[0].code[0].code !== data[1]));
 // a.forEach(f => da.splice(da.findIndex(e => e.room[0].code[0].code === f.room[0].code[0].code),1));
 
-console.log("removeFlagData", da );
+console.log("removeFlagData", da, newDa.filter(e => e.filter(f=>f.room[0].code[0].code !== data[1])));
 
 }
 
 function removeFlagDataSelf(data) {
-  console.log('removeFlagDataSelf1', data)
-  console.log("removeFlagDataSelf2", da );
-  da = da.filter(e => e.room[0].code[0].code !== data[1]);
+  console.log('removeFlagDataSelf1', data, voting)
+  let newDa = da.filter(value => Object.keys(value).length !== 0)
+  
+  console.log("removeFlagDataSelf2", da, newDa.filter(value => Object.keys(value).length !== 0),newDa.filter(ff=>ff.filter(f=>console.log("fff", f.room[0].code[0].code !== data[0])))
+  );
+da = newDa.filter(ff=>ff.includes(f=>f.room[0].code[0].code !== data[1]));
+
+// let empty = {room:[{code: code}, {voting: data}]}
+socket.emit("checkIsVoting", gameCodeDisplay.innerText, voting)
   // a.forEach(f => da.splice(da.findIndex(e => e.room[0].code[0].code === f.room[0].code[0].code),1));
   
   console.log("removeFlagDataSelf3", da );
@@ -304,7 +311,7 @@ function playerdc(displayUser) {
 
 function removeCard(remCard, data) {
 
-  console.log("remdaat", String(remCard[0]), String(remCard[1]), remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
+  console.log("remdaat", String(remCard[0]), String(remCard[1]), remCard, data);
   console.log("bb[0]", String(remCard[0]));
   console.log("dd[1]", String(remCard[1]));
   console.log("cc[2]", String(remCard[2]));
@@ -341,7 +348,7 @@ function removeCard(remCard, data) {
 
 function removeCardSelf(remCard, data) {
   // $('.red-flag-row').html('<div class="red-flag-section text-danger text-center"><p id="sign" style="cursor: pointer;"><i class="text-danger fas fa-plus"></i></p></div></div>')
-  console.log("remdaat", remCard, data, data.filter(f=>f[0].code === String(remCard[1]) && f[1].cards === String(remCard[0])).map(m=>m[2].user));
+  console.log("remdaat", remCard, data);
   console.log("bb[0]_self", String(remCard[0]));
   console.log("dd[1]_self", String(remCard[1]));
   console.log("cc[2]_self", String(remCard[2]));
@@ -417,13 +424,14 @@ $(document).on("click", "#new-red-flags-next-game", function () {
 
 function startVoteData(data, gameuser, userCardData, votingUser) {
   voting = true;
-  console.log("voting time", votingUser, data, gameuser );
+  console.log("voting time", voting, data, gameuser );
 socketIdData = gameuser.socketId
 if (voting === true){
+  socket.emit("isVoting", voting, gameCodeDisplay.innerText, data);
   $('.public-flags>*').remove()
-  data.filter(f=>f[2].user !== $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+  data.filter(f=>f.room[0].code[2].user !== $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
  m +"</div>"))
- data.filter(f=>f[2].user === $(".user span").html() && f[0].code === gameCodeDisplay.innerText).map(f=>f[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
+ data.filter(f=>f.room[0].code[2].user === $(".user span").html() && f.room[0].code[0].code === gameCodeDisplay.innerText).map(f=>f.room[0].code[1].cards).map(m=> $('.public-flags').append("<div class='card-section text-center'>"+
  m +"</div>"))
  $(".public-flags .card-section").css({
   "background-color": "#c82333",
@@ -439,7 +447,7 @@ if (voting === true){
   socket.emit("chooseWinner", [
     $(".user span").html(),
     gameCodeDisplay.innerText,
-    data.filter(f=>f[0].code === gameCodeDisplay.innerText).map(m=>m[2].user)
+    data.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText).map(m=>m.room[0].code[2].user)
   ]);
 
   $(".red-flag-row").html(
@@ -447,38 +455,8 @@ if (voting === true){
   );
 
 
-  // $(document).on('click', ".public-flags .card-section", { p1: userCardData, p2: votingUser }, voteUser);
 
-
-
-//   function voteUser(votingUser){
-//     console.log("data=", votingUser)
-//     if ($('.user span').html() === votingUser) {
-//       let cardz = $(this).html()
-
-//       console.log("dataa_click", userCardData, cardz)
-
-//       let remCard = [cardz, gameCodeDisplay.innerText, userCardData.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].cards === String(cardz)).map(m=>m[2].user)];
-//       console.log("remCard", remCard)
-//       socket.emit("removeCard", remCard, userCardData);
-//       $(".public-flags .card-section").css({
-//         "background-color": "white",
-//         color: "black",
-//       });
-//       $("#gameScreen .red-flag-row .red-flag-msg").remove();
-//       $("#gameScreen .red-flag-row").append(
-//         '<div id="new-red-flags-next-game" class="btn btn-danger"><span class="title">Next Round</span><i class="bottom-right fas fa-arrow-right"></i></div>'
-//       );
-//     }
-//   }
-  
-  // $(document).on("click", ".public-flags .card-section",{userCardData, votingUser}, function () {
-  //   console.log("data=", userCardData, votingUser)
-  //   voteUser()
-  // });
-
-  socket.emit("isVoting", voting, gameCodeDisplay.innerText, data);
-userCardData = ""
+// userCardData = ""
 }
 function voteUser(data, flag){
   console.log("voteuser")
@@ -490,7 +468,7 @@ function voteUser(data, flag){
     
         console.log("dataa_click", flag, cardz)
     
-        let remCard = [cardz, gameCodeDisplay.innerText, flag.filter(f=>f[0].code === gameCodeDisplay.innerText && f[1].cards === String(cardz)).map(m=>m[2].user)];
+        let remCard = [cardz, gameCodeDisplay.innerText, flag.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards === String(cardz)).map(m=>m.room[0].code[2].user)];
         console.log("remCard", remCard)
         socket.emit("removeCard", remCard, flag);
         $(".public-flags .card-section").css({
@@ -695,9 +673,11 @@ socket.on("disconnect", () => {
 // }
 
 function newFlagData(data, voting) {
-  if (data.length >0){
+  console.log("newFlagData11", data, voting);
+  if (data){
   if (voting === true) {
-    console.log("votin", voting);
+
+     socket.emit("voting", voting);
     $("#sign").bind("click", function () {
       return false;
     });
@@ -706,19 +686,18 @@ function newFlagData(data, voting) {
   } else {
     $("#sign").unbind("click");
     $("#sign").css({ cursor: "pointer" });
+
   }
 }
-else{
-  voting = false
-  socket.emit("voting", voting);
-}
+
   console.log("vvote", voting, data);
   
   let us =  $(".user span").html()
 	console.log("called1",  us)
   
-	console.log('newFlagData', voting, data.filter(e => e[0].code === gameCodeDisplay.innerText))
-	d.push(data.filter(e => e[0].code === gameCodeDisplay.innerText))
+	console.log('newFlagData', voting, data)
+  da.push(data)
+
 
 	
 	// 	// console.log('here', d.length, data.length)
@@ -726,40 +705,42 @@ else{
 	// 	m =>   $('.public-flags').append("<div class='card-section text-center'>"+m[i][1].cards.cards+"</div>")
 	// 	)
 	// }
-// if ($([...new Set(data)]).length > 0){
- $([...new Set(data)]).each(function (i){
-   		if ([$(this)].filter(cc => cc[0].code === gameCodeDisplay.innerText).length !== 0){
-		$('.public-flags').css({"display":"flex"})
-      }
+if (data){
+  let  newDa = [...new Set(da)].filter(value => Object.keys(value).length !== 0);
+  console.log('subFlagDataSelf_dddzz', newDa)
+  if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length !== 0){
+    $('.public-flags').css({"display":"flex"})
+    }   
+    
+                $('.public-flags>*').remove()
+        if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length > 0){
+          console.log('datav2====')
+          // $('.public-flags').append("<div class='card-section text-center'>"+
+          // newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards))+"</div>")  
+          newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[1].cards +"yyy</div>")+""))
+        }
+      if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user)).length > 0){
+        console.log('datav2====')
+        newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>"))+"")
+        }
+  // let  newDa = [...new Set(da)].filter(value => Object.keys(value).length !== 0);
 
-   $('.public-flags').append("<div class='card-section text-center'>"+
-[$(this)].filter(cc => cc[0].code === gameCodeDisplay.innerText).map(m=> m[1].cards)+"yyy</div>")
-  })
-// }
-//   let us = $(".user span").html();
-//   console.log("called1", us);
-//   console.log("newFlagData", [...new Set(data)]);
-//   d.push([...new Set(data)]);
-// console.log("ddd",d)
-//   for (let i = 0; i < [...new Set(d)].length; i++) {
-//     if(
-//        [...new Set(d)].filter(
-//         (cc) => cc[i].room[0].code.code === gameCodeDisplay.innerText
-//       ).length !== 0
-//     ) {
-//       $(".public-flags").css({ display: "flex" });
-//     }
-//     [...new Set(d)].filter(
-//         (cc) =>
-//           cc[i].room[0].code.code === gameCodeDisplay.innerText &&
-//           cc[i].room[2].user.user !== us
-//       )
-//       .map((m) => $(".public-flags").append(
-//           '<div class="card-section text-center">' +
-//             m[i].room[0].code[1].cards.cards +
-//             "</div>"
-//         )
-//       )
+  // console.log('newFlagData_dddzz', newDa.filter(f=>f.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards)).length !== 0)
+  
+
+  //   if (newDa.filter(f=>f.filter(f=>f.room[0].code[0].code === gameCodeDisplay.innerText && f.room[0].code[1].cards)).length !== 0){
+  // $('.public-flags').css({"display":"flex"})
+  //        }
+
+  //           $('.public-flags>*').remove()
+  //   if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length > 0){
+  //     $('.public-flags').append("<div class='card-section text-center'>"+
+  //     newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards))+"</div>")  
+  //   }
+  // if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user)).length > 0){
+  //   newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>"))+"")
+  //   }
+  }
 }
 
 
@@ -767,95 +748,65 @@ else{
 function subFlagDataSelf(data) {
 
    if (data){
-    console.log("called2", $(".user span").html());
+    console.log("subFlagDataSelfdata", data);
 
-
-    da.push(data)
+    da.push([data])
+console.log('subFlagDataSelfda', da)
   //   $('.public-flags .card-section').each(function (){
   // pubFlags.push($(this).text())
   //   })
     
-  let  newDa = [...new Set(da)]
-  console.log('dddzz', newDa, newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user))
-    if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length !== 0){
-  $('.public-flags').css({"display":"flex"})
-         }
-
-            $('.public-flags>*').remove()
-    if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length > 0){
-      $('.public-flags').append("<div class='card-section text-center'>"+
-      newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
-    }
-  if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
-    newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>")+"")
-    }
-  
-
-   
-
+  let  newDa = [...new Set(da)].filter(value => Object.keys(value).length !== 0);
+  console.log('subFlagDataSelf_dddzz', newDa)
+    if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length !== 0){
+      $('.public-flags').css({"display":"flex"})
+    }   
     
-  
-//     console.log("ddzzz", [data].filter(e => e.room[0].code[0].code === gameCodeDisplay.innerText))
-// 	da.push([data].filter(e => e.room[0].code[0].code === gameCodeDisplay.innerText))
-
-// 	$('.public-flags .card-section').each(function (){
-// pubFlags.push($(this).text())
-// 	})
-  
-//   newDa = [...new Set(da)]
-//    let b = pubFlags.filter(vv => vv) 
-// console.log("newda", newDa.filter(bb=>bb[0].room[0].code[0].code === gameCodeDisplay.innerText))
-// let newFlagArr = data
-// // let newFlagArrSet = [...(newFlagArr)]
-// if ([newFlagArr].map(m=>m.room[0].code[1].cards).length > 0){
-// $('.public-flags').css({'display':'flex'})
-// }
-
-
-
-
-  
-
-
-//       console.log('subFlagDatazself', da)
-//       console.log('subFlagDatazselfd',  newDa)
-//       console.log('yy',)
-// 	  console.log('zz', newFlagArr)
-//     socket.emit("showFlag", newFlagArr, gameCodeDisplay.innerText)
-//     console.log("votingxxx", voting)
-//     console.log("ddzz", data)
-//     console.log("called3", $(".user span").html());
-//   }
+                $('.public-flags>*').remove()
+        if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length > 0){
+          console.log('datav2====')
+          // $('.public-flags').append("<div class='card-section text-center'>"+
+          // newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards))+"</div>")  
+          newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[1].cards +"yyy</div>")+""))
         }
+      if (newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user)).length > 0){
+        console.log('datav2====')
+        newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>"))+"")
+        }
+  }
 }
+   
 
 
 function subFlagData(data) {
-    console.log("called2", $(".user span").html());
+    console.log("subFlagData", $(".user span").html());
 
 
     if (data){
-      console.log("called2", $(".user span").html());
+      console.log("subFlagData2", data);
   
-  
-      da.push(data)
+
+      da.push([data])
+      console.log("subFlagDatada", da);
     //   $('.public-flags .card-section').each(function (){
     // pubFlags.push($(this).text())
     //   })
       
-    let  newDa = [...new Set(da)]
-    console.log('dddzz', newDa, newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user))
-      if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length !== 0){
+    let  newDa = [...new Set(da)].filter(value => Object.keys(value).length !== 0);
+    console.log('subFlagData_dddzz', newDa)
+      if (newDa.filter(f=>f.filter(f=> f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)).length > 0){
     $('.public-flags').css({"display":"flex"})
            }
   
               $('.public-flags>*').remove()
-      if (newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards).length > 0){
-        $('.public-flags').append("<div class='card-section text-center'>"+
-        newDa.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)+"</div>")  
+      if (newDa.filter(f=>f.filter(f=> f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[1].cards)).length > 0){
+      console.log("datav1===", newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[1].cards)))
+      newDa.filter(f=>f.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>")+""))
+     
       }
-    if (newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>m.room[0].code[2].user).length > 0){
-      newDa.filter(f=>f.room[0].code[2].user !== $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[2].user +"'s FLAG</div>")+"")
+    if (newDa.filter(f=>f.filter(f=> f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[2].user)).length > 0){
+      console.log("datav1===", newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>m.room[0].code[1].cards)))
+      newDa.filter(f=>f.filter(f=>f.room[0].code[2].user === $('.user span').html()).map(m=>""+$('.public-flags').append("<div class='card-section text-center'>"+m.room[0].code[1].cards +"xxx</div>")+""))
       }
     }
 
@@ -1228,7 +1179,8 @@ $(loginGameBtn).on("click", function () {
 });
 $(joinGameBtn).on("click", function () {
   const code = gameCodeInput.value;
-  socket.emit("joinGame", code);
+  console.log("votinginit", voting)
+  socket.emit("joinGame", code, voting);
 });
 
 function handlePPerks(pperks) {
@@ -1242,7 +1194,7 @@ function handlePPerks(pperks) {
 let playerNumber;
 let gameActive = false;
 
-function init(roomName) {
+function init(roomName, voting) {
   const code = roomName;
   $(gameCodeDisplay).html(roomName);
   $(perk1).html($(gamePerk1).val());
@@ -1250,7 +1202,8 @@ function init(roomName) {
 
   let socketId = socket.id;
   socket.emit("newUser", { socketId, code, username });
-  socket.emit("newJoinFlag", code);
+  console.log("votingin", voting)
+  socket.emit("newJoinFlag", code, voting);
 
   initialScreen.style.display = "none";
   gameScreen.style.display = "block";

@@ -27,7 +27,7 @@ let flagStateRand = []
 let pperkss;
 let gameData = []
 let game = []
-let voting
+let voting = []
 let votingUser
 
 const clientRooms = {};
@@ -67,7 +67,12 @@ client.on('timer', timerData)
 // client.on('newRoundClean', newRoundClean)
 client.on('showFlag', showFlagHandle)
 client.on('votingUser', votingUserHandle)
+client.on('checkIsVoting', checkIsVoting)
 
+function checkIsVoting(code, data){
+console.log("checkIsVotingData", code, data)
+client.emit('checkIsVotingData', data)
+}
 function showFlagHandle(newFlagArr, code){
   // client.emit('showFlag', newFlagArr)
   client.broadcast.to(code).emit('showFlag', newFlagArr)
@@ -164,7 +169,7 @@ function leaderboardData(data){
 }
 function newRoundClear(code){
  
-  flagState = flagState.filter(e => e[0].code !== code)
+  flagState = flagState.filter(e => e.room[0].code[0].code !== code)
  console.log("newRoundClear", flagState, code)
 
 }
@@ -172,7 +177,7 @@ function newRoundClear(code){
 function votingHandle(voting, code){
   console.log("vvvdata", voting, code)
 
-  voting = voting
+  voting=voting
 
   client.emit('vote', voting)
   client.broadcast.to(code).emit('vote', voting )
@@ -207,7 +212,7 @@ console.log('room', room)
   if (numClients === 0) {
     client.emit('unknownCode');
     return;
-  } else if (numClients > 4) {
+  } else if (numClients > 99) {
     client.emit('tooManyPlayers');
     return;
   }
@@ -217,8 +222,8 @@ console.log('room', room)
     console.log('client', clientRooms[client.id])
   
     client.join(roomName);
-
-  client.emit('init', roomName);
+console.log("votinginit", voting)
+  client.emit('init', roomName, voting);
   }
 
 
@@ -363,13 +368,13 @@ function newJoinFlagDataHandle(cards){
   console.log("newJoinFlagDataHandle", cards)
 }
 
-function newJoinFlagHandle(code){
-  console.log("newJoinFlagHandle", voting, flagState.filter(f=>f[0].code === code))
+function newJoinFlagHandle(code, voting){
+  console.log("newJoinFlagHandle", voting, flagState.filter(f=>f.room[0].code[0].code === code))
 
     //if(flagState[0] != null){
 //if (flagState){
-  client.emit("testff", flagState.filter(f=>f[0].code === code) )
-      client.emit('newFlagData', flagState.filter(f=>f[0].code === code), voting)
+  client.emit("testff", flagState.filter(f=>f.room[0].code[0].code === code) )
+      client.emit('newFlagData', flagState.filter(f=>f.room[0].code[0].code === code), voting)
 //}
 //else{
 //  client.emit('newFlagData', flagStateRand)
@@ -395,7 +400,7 @@ function FlagCardsHandle(data, voting){
       let user = data.room[2].user
       let socketId = data.room[3].socketId
 // push data to global list 
-    flagState.push([{code},{cards},{user},{socketId}])
+    flagState.push({room:[{code:[{code},{cards},{user}, {socketId}]}]})
     console.log("flagStatepush",  flagState[0])
     codeStr = String(code)
     console.log("codeStrzzz", codeStr)
@@ -496,7 +501,7 @@ let name = Object.values(users)
 // console.log('nameee1', users[client.id])
 console.log("playerdccc", users[client.id])
 if (users[client.id]){
-  flagState = flagState.filter(e => e[0].code !== users[client.id].code)
+  flagState = flagState.filter(e => e.room[0].code[0].code !== users[client.id].code)
 client.broadcast.to(users[client.id].code).emit('playerdc', users[client.id].username.name)
 }
 delete users[client.id]
