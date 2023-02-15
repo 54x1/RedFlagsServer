@@ -1,5 +1,5 @@
 // let socket = io();
-const socket = io('https://red-flags-server.herokuapp.com/')
+const socket = io('https://red-flags-54x1.netlify.app/')
 let pppperksss;
 let cards;
 const username = {};
